@@ -13,7 +13,7 @@ The Vsync and Hsync signals are timed using Timer2 and dejittered using the slee
 
 The pixel output is used as the S input to a 74xx298 multiplexer to select the four bits of the paper/ink color. (Inspired in the Harlequin ZX Clone). http://www.zxdesign.info/colourselect.shtml
 
-A 6 resistor DAC is used to recreate the 1bit RGB+BRIGHT color pallete of the ZX.(in the Harlequin clone transistors are used for a more ZX-accurate output of 15 colors, but with 6 resistors we get 16 colors).
+A 6 resistor DAC is used to recreate the 1bit per channel RGB+BRIGHT color pallete of the ZX.(in the Harlequin clone transistors are used for a more ZX-accurate output of 15 colors, but with 6 resistors we get 16 colors).
 
 Other modes can easily be achieved (8x4, 8x2 and 8x1 attribute modes).
 

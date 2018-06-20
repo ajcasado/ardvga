@@ -15,7 +15,7 @@ The pixel output is used as the S input to a 74xx298 multiplexer to select the f
 
 The flash bit of the ZX attribute byte format is not used, instead i use one bright bit for paper and other bright bit for ink.
 
-A 6 resistor DAC is used to recreate the 1bit per channel RGB+BRIGHT color pallete of the ZX.(in the Harlequin clone transistors are used for a more ZX-accurate output of 15 colors, but with 6 resistors we get 16 colors).
+A 6 resistor DAC is used to recreate the 1bit per channel RGB+BRIGHT color pallete of the ZX.(in the Harlequin clone transistors are used for a more ZX-accurate output of 15 colors).
 
 Other modes can easily be achieved (8x4, 8x2 and 8x1 attribute modes).
 

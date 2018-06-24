@@ -24,3 +24,5 @@ This is a personal project, the code is ugly and incomplete and bad commented.
 
 
 If there is any interest I can publish the schematics, and comment out the code.
+
+There is a schematic for uno board in the schematics folder, this version is not tested yet.

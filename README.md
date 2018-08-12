@@ -23,6 +23,4 @@ Other modes can easily be achieved (8x4, 8x2 and 8x1 attribute modes).
 This is a personal project, the code is ugly and incomplete and bad commented.
 
 
-If there is any interest I can publish the schematics, and comment out the code.
-
 There are tested schematics for uno and nano boards based on atmega328p in the schematics folder.

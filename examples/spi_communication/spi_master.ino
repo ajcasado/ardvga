@@ -9,7 +9,7 @@
 typedef enum states {ocioso, quiero_mandar, mando_byte, byte_mandado, timeout} state_t;
 
 state_t state;
-char buff[MAX_BUFLEN] = {};
+char buff[MAX_BUFLEN] = {0};
 
 void setup(){
   state = ocioso;

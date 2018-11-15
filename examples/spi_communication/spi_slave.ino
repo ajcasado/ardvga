@@ -1,5 +1,4 @@
-//#include <ardvga.h>
-#include "../../src/ardvga.h"
+#include <ardvga.h>
 
 #define PIN_SS 10
 #define PNI_MOSI 11

@@ -22,7 +22,7 @@ void loop(){
   uint8_t buflen , i;
   switch (state) {
   case ocioso:
-    digitalWrite(PIN_SS , 0);
+    digitalWrite(PIN_SS , 1);
     STOP_TIMER();
     i = 0;
     buflen = 0;
@@ -32,12 +32,14 @@ void loop(){
     if (buflen > 0) state = quiero_mandar;
     break;
   case quiero_mandar:
-    SPI.beginTransaction(SPISettings (8000000 , MSBFIRST , SPI_MODE0));
+    SPI.beginTransaction(SPISettings (4000000 , MSBFIRST , SPI_MODE0));
     digitalWrite(PIN_SS , 0);
     START_TIMER();
     while (digitalRead(PIN_RTR) == 0);
     state = mando_byte;
   case mando_byte:
+    digitalWrite(PIN_SS , 1);
+    digitalWrite(PIN_SS , 0); //this reset the SPI buffer on slave to synchronize byte transfer
     SPI.transfer(buff[i++]); //I guess from SPI source that is a blocking transfer
     while (digitalRead(PIN_RTR) == 1);
     state = byte_mandado;

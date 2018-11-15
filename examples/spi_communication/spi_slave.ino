@@ -30,15 +30,10 @@ void loop(){
   uint8_t buflen , i;
   switch (state) {
   case ocioso:
-    digitalWrite(PIN_SS , 0);
+    digitalWrite(PIN_RTR , 0);
     STOP_TIMER();
-    i = 0;
-    buflen = 0;
-    while Serial.available() {
-      buff[buflen++] = Serial.read();
-    }
-    if (buflen > 0) state = quiero_mandar;
-    break;
+    while (digitalRead(PIN_SS) == 0);
+    state = puedo_recibir;
   case quiero_mandar:
     SPI.beginTransaction(SPISettings (8000000 , MSBFIRST , SPI_MODE0));
     digitalWrite(PIN_SS , 0);

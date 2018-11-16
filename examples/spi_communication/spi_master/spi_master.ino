@@ -71,7 +71,7 @@ void loop(){
     break;
   case timeout:
     SPI.endTransaction();
-    Serial.print(F("TIMEOUT!"))
+    Serial.print(F("TIMEOUT!"));
     state = ocioso;
   }
 }

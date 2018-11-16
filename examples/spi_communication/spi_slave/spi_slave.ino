@@ -90,6 +90,6 @@ void loop(){
 
 }
 
-ISR (TIMER1_COMPA_vect , ISR_NAKED){
+ISR (TIMER1_COMPA_vect){
   state = timeout;
 }

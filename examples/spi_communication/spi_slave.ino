@@ -1,9 +1,9 @@
 #include <ardvga.h>
 
 #define PIN_SS 10
-#define PNI_MOSI 11
-#define PNI_MISO 12
-#define PNI_SCK 13
+#define PIN_MOSI 11
+#define PIN_MISO 12
+#define PIN_SCK 13
 #define PIN_RTR 4
 #define MAX_BUFLEN 16
 #define START_TIMER()
@@ -41,7 +41,7 @@ void loop(){
     digitalWrite(PIN_RTR , 0);
     buflen = 0;
     memset(buffer, 0, MAX_BUFLEN);
-    while (digitalRead(PIN_SS) == 0);
+    while (digitalRead(PIN_SS));
     state = puedo_recibir;
   case puedo_recibir:
     digitalWrite(PIN_RTR , 1);
@@ -55,7 +55,7 @@ void loop(){
       state = buffer_overrun;
       break;
     }
-    if (digitalRead(PIN_SS)){
+    if (digitalRead(PIN_SS) == 0){
       state = puedo_recibir;
       break;
     }

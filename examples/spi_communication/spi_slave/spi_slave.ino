@@ -81,8 +81,8 @@ void loop(){
     sprintf_P(buf, PSTR("Received message:\n\0"));
     mivga.print(buf);
     mivga.print(buff);
-    sprintf_P(buf, PSTR("\nReceived bytes: %u\n\0",buflen));
-    mivga.print(buf);
+    sprintf_P(buf,  PSTR("\nReceived bytes: %u\n\0" , buflen));
+    mivga.print(buf , buflen);
     state = ocioso;
     break;
   case buffer_overrun:

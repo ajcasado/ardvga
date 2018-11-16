@@ -45,7 +45,7 @@ void loop(){
     buflen = 0;
     Serial.print(F("Insert a string of at most "));
     Serial.print(MAX_BUFLEN , DEC);
-    serial.println(F(" characters"))
+    Serial.println(F(" characters"))
     while ((Serial.available()) && (buflen < MAX_BUFLEN)) {
       buff[buflen++] = Serial.read();
     }

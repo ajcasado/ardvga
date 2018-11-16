@@ -3,12 +3,12 @@
 #define PIN_SS 10
 #define PIN_RTR 4
 #define MAX_BUFLEN 16
-#define START_TIMER()
-#define STOP_TIMER()
+#define START_TIMER() TIMSK1 |= (1 << OCIE1A);  // enable timer compare interrupt
+#define STOP_TIMER() TIMSK1 &= ~(1 << OCIE1A);
 
 typedef enum states {ocioso, quiero_mandar, mando_byte, byte_mandado, timeout} state_t;
 
-state_t state;
+volatile state_t state;
 char buff[MAX_BUFLEN] = {0};
 
 void setup(){
@@ -16,6 +16,19 @@ void setup(){
   pinMode (PIN_SS , OUTPUT);
   pinMode (PIN_RTR , INPUT);
   Serial.begin(115200);
+
+  //set timer1 interrupt at 1Hz -amandaghassaei https://www.instructables.com/id/Arduino-Timer-Interrupts/
+
+  TCCR1A = 0;// set entire TCCR1A register to 0
+  TCCR1B = 0;// same for TCCR1B
+  TCNT1  = 0;//initialize counter value to 0
+  // set compare match register for 1hz increments
+  OCR1A = 15624;// = (16*10^6) / (1*1024) - 1 (must be <65536)
+  // turn on CTC mode
+  TCCR1B |= (1 << WGM12);
+  // Set CS10 and CS12 bits for 1024 prescaler
+  TCCR1B |= (1 << CS12) | (1 << CS10);
+
 }
 
 void loop(){
@@ -46,11 +59,15 @@ void loop(){
   case byte_mandado:
     buflen--;
     if (buflen == 0){
+      SPI.endTransaction();
       state = ocioso;
       break;
     }
     while (digitalRead(PIN_RTR) == 0);
     state = mando_byte;
   }
+}
+
+ISR (TIMER2_COMPB_vect , ISR_NAKED){
 
 }

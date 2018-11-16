@@ -1,7 +1,10 @@
 #include <SPI.h>
 
-#define PIN_SS 10
-#define PIN_RTR 4
+#define PIN_SS 10 //PB2
+#define SET_SS_HIGH() PORTB |= (1 << PB2) // digitalWrite(PIN_SS , 1);
+#define SET_SS_LOW() PORTB &= ~(1 << PB2) // digitalWrite(PIN_SS , 0);
+#define PIN_RTR 6 //PD6
+#define GET_RTR_VALUE() (PIND & (1<<PD6)) /*digitalRead(PIN_RTR)*/// 0 for LOW or > 0 for HIGH
 #define MAX_BUFLEN 16
 #define START_TIMER() TIMSK1 |= (1 << OCIE1A) ; TCNT1 = 0  // enable timer compare interrupt
 #define STOP_TIMER() TIMSK1 &= ~(1 << OCIE1A)
@@ -35,7 +38,7 @@ void loop(){
   uint8_t buflen , i;
   switch (state) {
   case ocioso:
-    digitalWrite(PIN_SS , 1);
+    SET_SS_HIGH();
     STOP_TIMER();
     i = 0;
     buflen = 0;
@@ -46,16 +49,16 @@ void loop(){
     break;
   case quiero_mandar:
     SPI.beginTransaction(SPISettings (4000000 , MSBFIRST , SPI_MODE0));
-    digitalWrite(PIN_SS , 0);
+    SET_SS_LOW();
     START_TIMER();
-    while ((digitalRead(PIN_RTR) == 0) && (state != timeout));
+    while ((GET_RTR_VALUE() == 0) && (state != timeout));
     if (state == timeout) break;
     state = mando_byte;
   case mando_byte:
-    digitalWrite(PIN_SS , 1);
-    digitalWrite(PIN_SS , 0); //this reset the SPI buffer on slave to synchronize byte transfer
+    SET_SS_HIGH();
+    SET_SS_LOW(); //this reset the SPI buffer on slave to synchronize byte transfer
     SPI.transfer(buff[i++]); //I guess from SPI source that is a blocking transfer
-    while ((digitalRead(PIN_RTR) == 1) && (state != timeout));
+    while ((GET_RTR_VALUE() > 0) && (state != timeout));
     if (state == timeout) break;
     state = byte_mandado;
   case byte_mandado:
@@ -65,7 +68,7 @@ void loop(){
       state = ocioso;
       break;
     }
-    while ((digitalRead(PIN_RTR) == 0) && (state != timeout));
+    while ((GET_RTR_VALUE() == 0) && (state != timeout));
     if (state == timeout) break;
     state = mando_byte;
     break;

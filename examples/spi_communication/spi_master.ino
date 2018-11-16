@@ -3,8 +3,8 @@
 #define PIN_SS 10
 #define PIN_RTR 4
 #define MAX_BUFLEN 16
-#define START_TIMER() TIMSK1 |= (1 << OCIE1A);  // enable timer compare interrupt
-#define STOP_TIMER() TIMSK1 &= ~(1 << OCIE1A);
+#define START_TIMER() TIMSK1 |= (1 << OCIE1A)  // enable timer compare interrupt
+#define STOP_TIMER() TIMSK1 &= ~(1 << OCIE1A)
 
 typedef enum states {ocioso, quiero_mandar, mando_byte, byte_mandado, timeout} state_t;
 

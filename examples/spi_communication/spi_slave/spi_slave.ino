@@ -15,7 +15,7 @@
 
 typedef enum states {ocioso, puedo_recibir, recibo_byte, proceso_mensaje, buffer_overrun, timeout} state_t;
 
-state_t state;
+volatile state_t state;
 char buff[MAX_BUFLEN] = {0};
 char buf[24] = {0};
 

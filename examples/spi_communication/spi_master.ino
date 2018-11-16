@@ -3,7 +3,7 @@
 #define PIN_SS 10
 #define PIN_RTR 4
 #define MAX_BUFLEN 16
-#define START_TIMER() TIMSK1 |= (1 << OCIE1A)  // enable timer compare interrupt
+#define START_TIMER() TIMSK1 |= (1 << OCIE1A) ; TCNT1 = 0  // enable timer compare interrupt
 #define STOP_TIMER() TIMSK1 &= ~(1 << OCIE1A)
 
 typedef enum states {ocioso, quiero_mandar, mando_byte, byte_mandado, timeout} state_t;
@@ -48,13 +48,15 @@ void loop(){
     SPI.beginTransaction(SPISettings (4000000 , MSBFIRST , SPI_MODE0));
     digitalWrite(PIN_SS , 0);
     START_TIMER();
-    while (digitalRead(PIN_RTR) == 0);
+    while ((digitalRead(PIN_RTR) == 0) && (state != timeout));
+    if (state == timeout) break;
     state = mando_byte;
   case mando_byte:
     digitalWrite(PIN_SS , 1);
     digitalWrite(PIN_SS , 0); //this reset the SPI buffer on slave to synchronize byte transfer
     SPI.transfer(buff[i++]); //I guess from SPI source that is a blocking transfer
-    while (digitalRead(PIN_RTR) == 1);
+    while ((digitalRead(PIN_RTR) == 1) && (state != timeout));
+    if (state == timeout) break;
     state = byte_mandado;
   case byte_mandado:
     buflen--;
@@ -63,11 +65,17 @@ void loop(){
       state = ocioso;
       break;
     }
-    while (digitalRead(PIN_RTR) == 0);
+    while ((digitalRead(PIN_RTR) == 0) && (state != timeout));
+    if (state == timeout) break;
     state = mando_byte;
+    break;
+  case timeout:
+    SPI.endTransaction();
+    Serial.print(F("TIMEOUT!"))
+    state = ocioso;
   }
 }
 
-ISR (TIMER1_COMPB_vect , ISR_NAKED){
-
+ISR (TIMER1_COMPA_vect , ISR_NAKED){
+  state = timeout;
 }

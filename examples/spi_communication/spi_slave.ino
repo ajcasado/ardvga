@@ -6,7 +6,7 @@
 #define PIN_SCK 13
 #define PIN_RTR 4
 #define MAX_BUFLEN 16
-#define START_TIMER() TIMSK1 |= (1 << OCIE1A)  // enable timer compare interrupt
+#define START_TIMER() TIMSK1 |= (1 << OCIE1A) ; TCNT1 = 0  // enable timer compare interrupt
 #define STOP_TIMER() TIMSK1 &= ~(1 << OCIE1A)
 
 typedef enum states {ocioso, puedo_recibir, recibo_byte, proceso_mensaje, buffer_overrun, timeout} state_t;
@@ -57,7 +57,8 @@ void loop(){
   case puedo_recibir:
     digitalWrite(PIN_RTR , 1);
     START_TIMER();
-    while (SPIF == 0);
+    while ((SPIF == 0) && (state != timeout));
+    if (state == timeout) break;
     state = recibo_byte;
   case recibo_byte:
     digitalWrite(PIN_RTR , 0);
@@ -74,13 +75,21 @@ void loop(){
   case proceso_mensaje:
     buff[buflen] = 0;
     mivga.print(buf);
+    state = ocioso;
     break;
   case buffer_overrun:
+    sprintf_P(buf, PSTR("BUFFER OVERRUN!\n\0"));
+    mivga.print(buf);
+    state = ocioso;
+    break;
+  case timeout:
+    sprintf_P(buf, PSTR("TIMEOUT!\n\0"));
+    mivga.print(buf);
     state = ocioso;
   }
 
 }
 
-ISR (TIMER1_COMPB_vect , ISR_NAKED){
-
+ISR (TIMER1_COMPA_vect , ISR_NAKED){
+  state = timeout;
 }

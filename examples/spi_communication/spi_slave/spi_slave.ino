@@ -51,7 +51,7 @@ void loop(){
     STOP_TIMER();
     digitalWrite(PIN_RTR , 0);
     buflen = 0;
-    memset(buffer, 0, MAX_BUFLEN);
+    memset(buff, 0, MAX_BUFLEN);
     while (digitalRead(PIN_SS));
     state = puedo_recibir;
   case puedo_recibir:

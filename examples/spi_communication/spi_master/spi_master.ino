@@ -39,7 +39,7 @@ void loop(){
     STOP_TIMER();
     i = 0;
     buflen = 0;
-    while Serial.available() {
+    while (Serial.available()) {
       buff[buflen++] = Serial.read();
     }
     if (buflen > 0) state = quiero_mandar;

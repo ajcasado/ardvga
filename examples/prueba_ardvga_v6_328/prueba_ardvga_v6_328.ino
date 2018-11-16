@@ -3,7 +3,6 @@
 #include "rtype.h"
 #include "cauldron.h"
 #include "spectrum.h"
-#include "scarlett.h"
 #include "gameover.h"
 #include "saturn.h"
 #include "melody.h"

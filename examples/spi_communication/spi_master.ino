@@ -68,6 +68,6 @@ void loop(){
   }
 }
 
-ISR (TIMER2_COMPB_vect , ISR_NAKED){
+ISR (TIMER1_COMPB_vect , ISR_NAKED){
 
 }

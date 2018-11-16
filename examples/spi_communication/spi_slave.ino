@@ -74,7 +74,7 @@ void loop(){
     state = proceso_mensaje;
   case proceso_mensaje:
     buff[buflen] = 0;
-    mivga.print(buf);
+    mivga.print(buff);
     state = ocioso;
     break;
   case buffer_overrun:

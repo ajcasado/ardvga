@@ -24,7 +24,7 @@ ardvga mivga;
 void setup(){
   mivga.begin(12, 12, 0);
   mivga.ink(Cyan); mivga.paper(Blue); mivga.bPaper(0); mivga.bInk(1);
-  sprintf_P(buf, PSTR("SLAVE TEST\n\0"));
+  sprintf_P(buf, PSTR("*SLAVE TEST*\n\0"));
   mivga.print(buf);
   state = ocioso;
   pinMode (PIN_RTR , OUTPUT);

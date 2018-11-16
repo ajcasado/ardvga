@@ -8,6 +8,7 @@
 #define MAX_BUFLEN 16
 #define START_TIMER() TIMSK1 |= (1 << OCIE1A) ; TCNT1 = 0  // enable timer compare interrupt
 #define STOP_TIMER() TIMSK1 &= ~(1 << OCIE1A)
+#define nop() __asm__("nop\n\t") //Wait one clock cycle
 
 typedef enum states {ocioso, quiero_mandar, mando_byte, byte_mandado, timeout} state_t;
 
@@ -42,7 +43,10 @@ void loop(){
     STOP_TIMER();
     i = 0;
     buflen = 0;
-    while (Serial.available()) {
+    Serial.print(F("Insert a string of at most "));
+    Serial.print(MAX_BUFLEN , DEC);
+    serial.println(F(" characters"))
+    while ((Serial.available()) && (buflen < MAX_BUFLEN)) {
       buff[buflen++] = Serial.read();
     }
     if (buflen > 0) state = quiero_mandar;
@@ -56,8 +60,10 @@ void loop(){
     state = mando_byte;
   case mando_byte:
     SET_SS_HIGH();
-    SET_SS_LOW(); //this reset the SPI buffer on slave to synchronize byte transfer
-    SPI.transfer(buff[i++]); //I guess from SPI source that is a blocking transfer
+    nop();
+    nop(); //Keep SS HIGH for 4 cycles to make effect on slave
+    SET_SS_LOW(); //this resets the SPI buffer on the slave to synchronize byte transfer
+    SPI.transfer(buff[i++]); //I guess from SPI library source that this is a blocking transfer
     while ((GET_RTR_VALUE() > 0) && (state != timeout));
     if (state == timeout) break;
     state = byte_mandado;

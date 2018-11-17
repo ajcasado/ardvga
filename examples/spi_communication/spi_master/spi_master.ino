@@ -51,7 +51,7 @@ void loop(){
     if (buflen > 0) state = quiero_mandar;
     break;
   case quiero_mandar:
-    SPI.beginTransaction(SPISettings (4000000 , MSBFIRST , SPI_MODE0));
+    SPI.beginTransaction(SPISettings (4000000 , MSBFIRST , SPI_MODE3));
     SET_SS_LOW();
     START_TIMER();
     while ((GET_RTR_VALUE() > 0) && (state != timeout));

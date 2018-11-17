@@ -30,12 +30,12 @@ void setup(){
   pinMode (PIN_RTR , OUTPUT);
   /* Set MISO output, all others input */
   pinMode (PIN_MISO , OUTPUT);
-  pinMode (PIN_MOSI , INPUT);
-  pinMode (PIN_SCK , INPUT);
+  pinMode (PIN_MOSI , INPUT_PULLUP);
+  pinMode (PIN_SCK , INPUT_PULLUP);
   pinMode (PIN_SS , INPUT_PULLUP);
-  /* Enable SPI in Slave mode, mode 0 , 4MHz , MSBFIRST*/
-  SPCR = (1<<SPE);
-  //set timer1 interrupt at 1Hz -amandaghassaei https://www.instructables.com/id/Arduino-Timer-Interrupts/
+  /* Enable SPI in Slave mode, mode 3 , MSBFIRST  (clock speed driven by master)*/
+  SPCR = (1<<SPE) | (1<<CPOL) | (1<<CPHA);
+  //set timer1 interrupt at 1Hz -amandaghassaei https://www.instructables.com/id/Arduino-Timer-Interrupts/)
   TCCR1A = 0;// set entire TCCR1A register to 0
   TCCR1B = 0;// same for TCCR1B
   TCNT1  = 0;//initialize counter value to 0

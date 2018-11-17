@@ -10,7 +10,7 @@
 #define SET_RTR_LOW() PORTD &= ~(1 << PD6) // digitalWrite(PIN_SS , 0);
 
 #define MAX_BUFLEN 16
-#define START_TIMER() TIMSK1 |= (1 << OCIE1A) ; TCNT1 = 0  // enable timer compare interrupt
+#define START_TIMER() TIMSK1 |= (1 << OCIE1A) ; TCNT1 = 0  // enable timer compare interrupt, clear counter.
 #define STOP_TIMER() TIMSK1 &= ~(1 << OCIE1A)
 
 typedef enum states {ocioso, puedo_recibir, recibo_byte, proceso_mensaje, buffer_overrun, timeout} state_t;
@@ -45,7 +45,6 @@ void setup(){
   TCCR1B |= (1 << WGM12);
   // Set CS10 and CS12 bits for 1024 prescaler
   TCCR1B |= (1 << CS12) | (1 << CS10);
-
 }
 
 void loop(){
@@ -53,19 +52,19 @@ void loop(){
   switch (state) {
   case ocioso:
     STOP_TIMER();
-    SET_RTR_LOW();
+    SET_RTR_HIGH();
     buflen = 0;
     memset(buff, 0, MAX_BUFLEN);
     while (GET_SS_VALUE());
     state = puedo_recibir;
   case puedo_recibir:
-    SET_RTR_HIGH();
+    SET_RTR_LOW();
     START_TIMER();
     while ((SPIF == 0) && (state != timeout));
     if (state == timeout) break;
     state = recibo_byte;
   case recibo_byte:
-    SET_RTR_LOW();
+    SET_RTR_HIGH();
     buff[buflen++] = SPDR;
     if (buflen > MAX_BUFLEN){
       state = buffer_overrun;

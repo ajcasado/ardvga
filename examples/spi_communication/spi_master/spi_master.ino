@@ -6,7 +6,7 @@
 #define PIN_RTR 6 //PD6
 #define GET_RTR_VALUE() (PIND & (1<<PD6)) /*digitalRead(PIN_RTR)*/// 0 for LOW or > 0 for HIGH
 #define MAX_BUFLEN 16
-#define START_TIMER() TIMSK1 |= (1 << OCIE1A) ; TCNT1 = 0  // enable timer compare interrupt
+#define START_TIMER() TIMSK1 |= (1 << OCIE1A) ; TCNT1 = 0  // enable timer compare interrupt, clear counter.
 #define STOP_TIMER() TIMSK1 &= ~(1 << OCIE1A)
 #define nop() __asm__("nop\n\t") //Wait one clock cycle
 
@@ -18,7 +18,7 @@ char buff[MAX_BUFLEN] = {0};
 void setup(){
   state = ocioso;
   pinMode (PIN_SS , OUTPUT);
-  pinMode (PIN_RTR , INPUT);
+  pinMode (PIN_RTR , INPUT_PULLUP);
   Serial.begin(115200);
 
   //set timer1 interrupt at 1Hz -amandaghassaei https://www.instructables.com/id/Arduino-Timer-Interrupts/
@@ -32,7 +32,6 @@ void setup(){
   TCCR1B |= (1 << WGM12);
   // Set CS10 and CS12 bits for 1024 prescaler
   TCCR1B |= (1 << CS12) | (1 << CS10);
-
 }
 
 void loop(){
@@ -45,7 +44,7 @@ void loop(){
     buflen = 0;
     Serial.print(F("Insert a string of at most "));
     Serial.print(MAX_BUFLEN , DEC);
-    Serial.println(F(" characters"));
+    serial.println(F(" characters:"))
     while ((Serial.available()) && (buflen < MAX_BUFLEN)) {
       buff[buflen++] = Serial.read();
     }
@@ -55,7 +54,7 @@ void loop(){
     SPI.beginTransaction(SPISettings (4000000 , MSBFIRST , SPI_MODE0));
     SET_SS_LOW();
     START_TIMER();
-    while ((GET_RTR_VALUE() == 0) && (state != timeout));
+    while ((GET_RTR_VALUE() > 0) && (state != timeout));
     if (state == timeout) break;
     state = mando_byte;
   case mando_byte:
@@ -64,7 +63,7 @@ void loop(){
     nop(); //Keep SS HIGH for 4 cycles to make effect on slave
     SET_SS_LOW(); //this resets the SPI buffer on the slave to synchronize byte transfer
     SPI.transfer(buff[i++]); //I guess from SPI library source that this is a blocking transfer
-    while ((GET_RTR_VALUE() > 0) && (state != timeout));
+    while ((GET_RTR_VALUE() == 0) && (state != timeout));
     if (state == timeout) break;
     state = byte_mandado;
   case byte_mandado:
@@ -74,7 +73,7 @@ void loop(){
       state = ocioso;
       break;
     }
-    while ((GET_RTR_VALUE() == 0) && (state != timeout));
+    while ((GET_RTR_VALUE() > 0) && (state != timeout));
     if (state == timeout) break;
     state = mando_byte;
     break;

@@ -55,7 +55,7 @@ void loop(){
     SET_RTR_HIGH();
     buflen = 0;
     memset(buff, 0, MAX_BUFLEN);
-    while (GET_SS_VALUE());
+    while (GET_SS_VALUE() > 0);
     state = puedo_recibir;
   case puedo_recibir:
     SET_RTR_LOW();
@@ -94,7 +94,6 @@ void loop(){
     mivga.print(buf);
     state = ocioso;
   }
-
 }
 
 ISR (TIMER1_COMPA_vect){

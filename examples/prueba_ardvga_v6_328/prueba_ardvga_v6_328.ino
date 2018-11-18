@@ -11,16 +11,16 @@ ardvga mivga;
 
 void setup() {
   mivga.begin(12,12,1);
-  mivga.setSkipLine();
+  //mivga.setSkipLine();
   mivga.setMode_720();
-  mivga.delay(10000);
+  mivga.tone (NOTE_A4,1000);
+  mivga.delay(5000);
 }
 
 void loop() {
   uint32_t ciclo[5] = {0};
   /*for (uint8_t r=0;r<5;r++){
   uint32_t cic = mivga.countLines();*/
-  mivga.tone (NOTE_A4,1000);
   /*const uint8_t PROGMEM *tmpBitmaps;
   const uint8_t PROGMEM *tmpAttributes;
   tmpBitmaps = spectrumBitmaps;
@@ -33,11 +33,20 @@ void loop() {
   mivga.delay(5000);*/
   mivga.ink(inkBlue); mivga.paper(paperWhite); mivga.bPaper(brightPaper);mivga.bInk(noBright);
   mivga.cls();
-
+  char buf[45]={0};
+//  sprintf_P(buf,PSTR("%u\n%u,%u\n%u,%u\n%u,%u\n%u,%u\n%u,%u\n%u,%u\n%u,%u\n%u,%u\n%u,%u\n\0"),inkBlue | paperWhite | brightPaper | noBright,inkBlue,paperBlue,inkRed,paperRed,inkGreen,paperGreen,inkMagenta,paperMagenta,inkCyan,paperCyan,inkYellow,paperYellow,inkWhite,paperWhite,inkBlack,paperBlack,brightInk,brightPaper);
+//  mivga.print(buf);
+//  mivga.delay(60000);
+  for (uint8_t l = 0; l < mivga.getVChars(); l++)
+    for (uint8_t c = 0; c < mivga.getHChars(); c++) {
+      mivga.setattr(l, c, (l & 7) << 3, c & 7, (c & 1) << 6, (l & 1) << 6);
+      //putChar(((l*mivga.horizontalChars+c) % 95)+31, l, c); //ZX Charset
+      mivga.putChar((l*mivga.getHChars()+c) & 0xff, l, c);//cp437 Charset
+    }
+  mivga.delay(60000);
   for (uint16_t thisNote = 0; thisNote < 53; thisNote++) {
     uint16_t noteDuration = ((2000) / mivga.safeReadFlashWord(noteDurations , thisNote));
     uint16_t noteTone = mivga.safeReadFlashWord(melody , thisNote);
-    char buf[14]={0};
     sprintf_P(buf,PSTR("             "));
     mivga.setCursor(0,0);
     mivga.print(buf);
@@ -98,7 +107,6 @@ void loop() {
   mVcc = (int)Vcc;*/
   for (uint8_t r=0;r<5;r++){
     uint32_t cic = mivga.countLines();
-    char buf[14]={0};
     sprintf_P(buf, PSTR("Hola mundo!\0"));
     mivga.setCursor(2,5);
     mivga.print(buf);
@@ -165,12 +173,7 @@ void loop() {
   }
   /*mivga.setNoSkipLine();
   mivga.setMode_720();*/
-  for (uint8_t l = 0; l < mivga.getVChars(); l++)
-    for (uint8_t c = 0; c < mivga.getHChars(); c++) {
-      mivga.setattr(l, c, l & 7, c & 7, c & 1, l & 1);
-      //putChar(((l*mivga.horizontalChars+c) % 95)+31, l, c); //ZX Charset
-      mivga.putChar((l*mivga.getHChars()+c) & 0xff, l, c);//cp437 Charset
-    }
+
 //  mivga.delay(10000);
   ciclo[r]=mivga.countLines()-cic;
  }
@@ -187,7 +190,7 @@ void loop() {
   mivga.bPaper(noBright);
   mivga.bInk(brightInk);
   mivga.setCursor(0, 0);
-  char buf[45]={0};
+
   sprintf_P(buf, PSTR("MAX:%lu,MIN:%lu,AVG:%lu\nRAM:%u\0"), maxc,minc,avgc,mivga.freeRam());
   mivga.print(buf);
   mivga.delay(30000);

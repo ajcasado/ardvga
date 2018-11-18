@@ -55,22 +55,24 @@
   #define pixel_ton() UCSR0B = (1<<TXEN0)
   #define pixel_toff() UCSR0B = 0
   #define PIXEL_DR UDR0
-  #define VGA_SYNC_CR DDRD
-  #define VGA_SYNC_PORT PORTD
-  #define VSYNC_PIN PD7
-  #define VSYNC_PIN_UP_MASK B10000000 // (1<<VSYNC_PIN)
-  #define VSYNC_PIN_DOWN_MASK B01111111 // ~VSYNC_PIN_UP_MASK
+  #define H_SYNC_CR DDRD
+  #define H_SYNC_PORT PORTD
   #define HSYNC_PIN PD3
+  #define V_SYNC_CR DDRB
+  #define V_SYNC_PORT PORTB
+  #define VSYNC_PIN PB0
+  #define VSYNC_PIN_UP_MASK B00000001 // (1<<VSYNC_PIN)
+  #define VSYNC_PIN_DOWN_MASK B11111110 // ~VSYNC_PIN_UP_MASK
   #define VGA_PIXEL_CR DDRD
   #define VGA_PIXEL_PORT PORTD
   #define VGA_PIXEL_PIN PD1
   #define VGA_CLOCK_PIN PD4
   #define VGA_ATTRIBUTE_CR DDRC
   #define VGA_ATTRIBUTE_PORT PORTC
-  #define VGA_ATTRIBUTE_B_CR DDRB
-  #define VGA_ATTRIBUTE_B_PORT PORTB
-  #define VGA_ATTRIBUTE_B_PIN PINB
-  #define VGA_ATTRIBUTE_B_MASK B00000011// (1<<VSYNC_PIN)
+  #define VGA_ATTRIBUTE_B_CR DDRD
+  #define VGA_ATTRIBUTE_B_PORT PORTD
+  #define VGA_ATTRIBUTE_B_PIN PIND
+  #define VGA_ATTRIBUTE_B_MASK B11000000
   #define SOUNDPORT PORTD
   #define SOUNDPORTCR DDRD
   #define SOUNDPIN PD5
@@ -119,7 +121,7 @@
 #define inkCyan (inkBlue | inkGreen)
 #define inkYellow (inkRed | inkGreen)
 #define inkWhite (inkBlue | inkRed | inkGreen)
-#define inkBlack ~inkWhite
+#define inkBlack B00000000
 #define paperBlue inkBlue << 3
 #define paperRed inkRed  << 3
 #define paperMagenta inkMagenta  << 3
@@ -127,9 +129,9 @@
 #define paperCyan inkCyan  << 3
 #define paperYellow inkYellow  << 3
 #define paperWhite inkWhite  << 3
-#define paperBlack inkBlack  << 3
-#define brightInk B01000000
-#define brightPaper B10000000
+#define paperBlack B00000000
+#define brightInk B10000000
+#define brightPaper B01000000
 #define noBright B00000000
 
 

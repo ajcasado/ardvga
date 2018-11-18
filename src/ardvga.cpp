@@ -40,7 +40,7 @@ void ardvga::begin(uint8_t height , uint8_t width , uint8_t doSplash /*añadir m
   setCRTCTRL(hT);
   sei();
   if (doSplash) {
-    Ink = White; Paper = Black; PaperBright=0;InkBright=0;cls();
+    Ink = inkWhite; Paper = paperBlack; PaperBright=noBright;InkBright=noBright;cls();
     char initMessage[15] = {0};
     sprintf_P(initMessage, PSTR("ArdVga Library\n\0"));
     print(initMessage);
@@ -154,10 +154,10 @@ ISR (TIMER2_OVF_vect){
     case _720:
       switch(ardvga::scanLine){
       case 1:
-        VGA_SYNC_PORT |= VSYNC_PIN_UP_MASK;
+        V_SYNC_PORT |= VSYNC_PIN_UP_MASK;
         break;
       case 3:
-        VGA_SYNC_PORT &= VSYNC_PIN_DOWN_MASK;
+        V_SYNC_PORT &= VSYNC_PIN_DOWN_MASK;
         break;
       case 36: //Standard back porch in lines
         ardvga::doLine = 1;
@@ -169,10 +169,10 @@ ISR (TIMER2_OVF_vect){
     case _640:
       switch(ardvga::scanLine){
       case 1:
-        VGA_SYNC_PORT |= VSYNC_PIN_UP_MASK;
+        V_SYNC_PORT |= VSYNC_PIN_UP_MASK;
         break;
       case 3:
-        VGA_SYNC_PORT &= VSYNC_PIN_DOWN_MASK;
+        V_SYNC_PORT &= VSYNC_PIN_DOWN_MASK;
         break;
       case 35: //Standard back porch in lines
         ardvga::doLine = 1;
@@ -184,33 +184,34 @@ ISR (TIMER2_OVF_vect){
   sei();
   sleep_mode ();
 }
+
+#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328P__)
+
 ISR (TIMER2_COMPB_vect){
 if (ardvga::doLine && ((ardvga::skipLine && (ardvga::scanLine & 1)) || !(ardvga::skipLine))){
     uint8_t i = ardvga::horizontalChars;
     uint8_t j = ardvga::drawLine / 4; //este cuatro se puede calcular en función de verticalCharsBck
     uint8_t * attrPtr = ardvga::attributesBck + ((j/8) * i);
     uint8_t * bmskPtr = ardvga::bitmaskBck + (j * i);
-    uint8_t aux = VGA_ATTRIBUTE_B_PIN | VGA_ATTRIBUTE_B_MASK ;
+    uint8_t aux = VGA_ATTRIBUTE_B_PIN;
     pixel_ton();
-    //nop();
-    j=aux;
+    nop();
     while (i--)
     {
       uint8_t k = *(attrPtr);
-      j = k & aux;
-      //j &= (k / 64) & aux;
+      j = (k & VGA_ATTRIBUTE_B_MASK);
       PIXEL_DR = *(bmskPtr);
-      k=k/4; //si j=k/64 esto sobra y las funciones de seteo de atributos son comunes en todas las plataformas?
-      VGA_ATTRIBUTE_B_PORT = j; //Esto debería respetar el resto de bits del puerto
+      j |= aux;
+      nop();
+      VGA_ATTRIBUTE_B_PORT = j;
       VGA_ATTRIBUTE_PORT = k;
-      bmskPtr++;
       attrPtr++;
+      bmskPtr++;
     }
     i = 1 + ardvga::skipLine;
     PIXEL_DR = 0;
     pixel_toff();
-    nop();
-    VGA_ATTRIBUTE_B_PORT = aux & (~ VGA_ATTRIBUTE_B_MASK);
+    VGA_ATTRIBUTE_B_PORT &= ~VGA_ATTRIBUTE_B_MASK;
     VGA_ATTRIBUTE_PORT = BLANK;
     ardvga::drawLine += i;
   }
@@ -235,11 +236,11 @@ if (ardvga::doLine && ((ardvga::skipLine && (ardvga::scanLine & 1)) || !(ardvga:
 
 }
 
-#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328P__)
 
   void ardvga::setupIO() {
 
-    VGA_SYNC_CR |= (1 << VSYNC_PIN) | (1 << HSYNC_PIN);
+    V_SYNC_CR |= (1 << VSYNC_PIN);
+    H_SYNC_CR |= (1 << HSYNC_PIN);
     VGA_PIXEL_CR |= (1 << VGA_PIXEL_PIN) | (1 << VGA_CLOCK_PIN);
     VGA_ATTRIBUTE_CR = B11111111;
     VGA_ATTRIBUTE_B_CR |= VGA_ATTRIBUTE_B_MASK;
@@ -332,7 +333,7 @@ if (ardvga::doLine && ((ardvga::skipLine && (ardvga::scanLine & 1)) || !(ardvga:
     //*(attributes + (line * horizontalChars) + column) = ((((inkbright)&1)) | (((paperbright)&1) << 1 ) | (paper << 5) | (ink << 2));
     //attributes[line][column] = ((((inkbright)&1) << 7) | (((paperbright)&1) << 6) | (paper << 3) | (ink));
     //*(attributes + (line * horizontalChars) + column) = ((((inkbright)&1) << 7) | (((paperbright)&1) << 6) | (paper << 3) | (ink));
-    *(attributes + (line * horizontalChars) + column) = paperbright | inkbright | paper | ink ;
+    *(attributes + (line * horizontalChars) + column) = (paperbright | inkbright | paper | ink) ;
     return 0;
   }
   void ardvga::scrollau( uint8_t i) {

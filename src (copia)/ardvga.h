@@ -95,7 +95,7 @@
 //#define STD_HT 63 // Using a 16bit timer maybe the limits can be pushed more
 #define MAX_HT (((F_CPU/8)/27027)-1) /*experimental minimum synchronizable F_HORIZONTAL timing for LG W2261 using 8bit counter (i2c hack?)*/
 #define STD_HT (((F_CPU/8)/31469)-1) /*F_HORIZONTAL industry standard*/ /*std_HT 63*/
-#define HT 65
+#define HT 63
 //#define HT STD_HT
 //#define HT 73 //(70 max with schneider TV)
 #define F_HORIZONTAL ((F_CPU/8)/(HT+1)) // 8 is the TIMER2 prescale

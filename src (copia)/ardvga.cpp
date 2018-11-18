@@ -197,10 +197,10 @@ if (ardvga::doLine && ((ardvga::skipLine && (ardvga::scanLine & 1)) || !(ardvga:
     while (i--)
     {
       uint8_t k = *(attrPtr);
-      j = k & aux;
-      //j &= (k / 64) & aux;
+      //j = k & aux;
+      j &= (k / 64) & aux;
       PIXEL_DR = *(bmskPtr);
-      k=k/4; //si j=k/64 esto sobra y las funciones de seteo de atributos son comunes en todas las plataformas?
+      //k=k/4; //si j=k/64 esto sobra y las funciones de seteo de atributos son comunes en todas las plataformas?
       VGA_ATTRIBUTE_B_PORT = j; //Esto debería respetar el resto de bits del puerto
       VGA_ATTRIBUTE_PORT = k;
       bmskPtr++;

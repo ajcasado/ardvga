@@ -5,7 +5,6 @@
 
       if (ardvga::hLine > (ardvga::sndFreq / 2/*^(255/vol) o (1<<vol)))*/
 /*cambiando el 2 debería poder hacer "PWM" y controlar el volumen de salida*/
-volatile uint8_t ardvga::doLine = 0;
 volatile uint16_t ardvga::drawLine = 0;
 volatile uint16_t ardvga::scanLine = 0;
 volatile uint16_t ardvga::hLine = 0;
@@ -92,7 +91,8 @@ void ardvga::toggleMode(){
     case _720:
       mode = _640;
       break;
-    case _640:
+    case _640://volatile uint8_t ardvga::doLine = 0;
+
       mode = _720;
   }
 }
@@ -149,7 +149,6 @@ uint16_t ardvga::getVPixels(){
   return (verticalChars * 8);
 }
 ISR (TIMER2_OVF_vect){
-
   switch (ardvga::mode){
     case _720:
       switch(ardvga::scanLine){
@@ -160,7 +159,7 @@ ISR (TIMER2_OVF_vect){
         V_SYNC_PORT &= VSYNC_PIN_DOWN_MASK;
         break;
       case 36: //Standard back porch in lines
-        ardvga::doLine = 1;
+        ardvga::drawLine = 1;
         break;
       case 449:
         ardvga::scanLine = 0;
@@ -175,7 +174,7 @@ ISR (TIMER2_OVF_vect){
         V_SYNC_PORT &= VSYNC_PIN_DOWN_MASK;
         break;
       case 35: //Standard back porch in lines
-        ardvga::doLine = 1;
+        ardvga::drawLine = 1;
         break;
       case 525:
         ardvga::scanLine = 0;
@@ -188,11 +187,12 @@ ISR (TIMER2_OVF_vect){
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328P__)
 
 ISR (TIMER2_COMPB_vect){
-if (ardvga::doLine && ((ardvga::skipLine && (ardvga::scanLine & 1)) || !(ardvga::skipLine))){
+  //anidar los ifs 1º drawline, luego skipLine y luego scanline &1
+  if (ardvga::drawLine && ((ardvga::skipLine && (ardvga::scanLine & 1)) || !(ardvga::skipLine))){
     uint8_t i = ardvga::horizontalChars;
     uint8_t j = ardvga::drawLine / 4; //este cuatro se puede calcular en función de verticalCharsBck
-    uint8_t * attrPtr = ardvga::attributesBck + ((j/8) * i);
-    uint8_t * bmskPtr = ardvga::bitmaskBck + (j * i);
+    uint8_t *attrPtr = ardvga::attributesBck + ((j/8) * i);
+    uint8_t *bmskPtr = ardvga::bitmaskBck + (j * i);
     uint8_t aux = VGA_ATTRIBUTE_B_PIN;
     pixel_ton();
     nop();
@@ -217,7 +217,6 @@ if (ardvga::doLine && ((ardvga::skipLine && (ardvga::scanLine & 1)) || !(ardvga:
   }
   ardvga::lineCounter++;
   if (ardvga::scanLine++ == ardvga::vFrontPorch){
-    ardvga::doLine = 0;
     ardvga::drawLine = 0;
   }
   if (ardvga::sndDur){
@@ -830,5 +829,5 @@ void ardvga::tone (uint16_t frequency,uint32_t duration){
 }
 uint8_t ardvga::isDoingLine(){
   //return (ardvga::doLine && ((ardvga::skipLine && (ardvga::scanLine & 1)) || !(ardvga::skipLine)));
-  return ardvga::doLine;
+  return ardvga::drawLine;
 }

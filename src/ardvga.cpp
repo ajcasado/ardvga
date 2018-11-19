@@ -103,7 +103,7 @@ bool ardvga::setResolution(uint8_t height , uint8_t width){
     if (attributes = (uint8_t *) malloc ((height*width)*sizeof(uint8_t))){
       verticalChars = height;
       horizontalChars = width;
-      vFrontPorch = (((verticalChars*8)+9)*4);
+      vFrontPorch = (((verticalChars*8)+9)*4)-2;
       bitmaskBck = bitmask;
       attributesBck = attributes;
       verticalCharsBck = verticalChars;
@@ -186,56 +186,7 @@ ISR (TIMER2_OVF_vect){
 
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328P__)
 
-/*ISR (TIMER2_COMPB_vect){
-  //anidar los ifs 1º drawline, luego skipLine y luego scanline &1
-  if (ardvga::drawLine && ((ardvga::skipLine && (ardvga::scanLine & 1)) || !(ardvga::skipLine))){
-    uint8_t i = ardvga::horizontalChars;
-    uint8_t j = ardvga::drawLine / 4; //este cuatro se puede calcular en función de verticalCharsBck
-    uint8_t *attrPtr = ardvga::attributesBck + ((j/8) * i);
-    uint8_t *bmskPtr = ardvga::bitmaskBck + (j * i);
-    uint8_t aux = VGA_ATTRIBUTE_B_PIN;
-    pixel_ton();
-    nop();
-    while (i--)
-    {
-      uint8_t k = *(attrPtr);
-      j = (k & VGA_ATTRIBUTE_B_MASK);
-      PIXEL_DR = *(bmskPtr);
-      j |= aux;
-      nop();
-      VGA_ATTRIBUTE_B_PORT = j;
-      VGA_ATTRIBUTE_PORT = k;
-      attrPtr++;
-      bmskPtr++;
-    }
-    i = 1 + ardvga::skipLine;
-    PIXEL_DR = 0;
-    pixel_toff();
-    VGA_ATTRIBUTE_B_PORT &= ~VGA_ATTRIBUTE_B_MASK;
-    VGA_ATTRIBUTE_PORT = BLANK;
-    ardvga::drawLine += i;
-  }
-  ardvga::lineCounter++;
-  if (ardvga::scanLine++ == ardvga::vFrontPorch){
-    ardvga::drawLine = 0;
-  }
-  if (ardvga::sndDur){
-    ardvga::sndDur--;
-    if(ardvga::hLine++ > ardvga::sndFreq)
-      ardvga::hLine=0;
-    else
-      if (ardvga::hLine > (ardvga::sndFreq / 2)) // (4/5) es el volumen
-        soundon();
-      else
-        soundoff();
-  }
-  else{
-    //gestionar buffer de sonido
-  }
-
-}*/
 ISR (TIMER2_COMPB_vect){
-  //anidar los ifs 1º drawline, luego skipLine y luego scanline &1
   if (ardvga::drawLine){
     if (!ardvga::skipLine){
       uint8_t i = ardvga::horizontalChars;
@@ -270,7 +221,6 @@ ISR (TIMER2_COMPB_vect){
       uint8_t *bmskPtr = ardvga::bitmaskBck + (j * i);
       uint8_t aux = VGA_ATTRIBUTE_B_PIN;
       pixel_ton();
-
       while (i--)
       {
         uint8_t k = *(attrPtr);

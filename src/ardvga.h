@@ -214,10 +214,10 @@ class ardvga{
 	private:
 
     static volatile uint32_t lineCounter;
-    static volatile uint32_t sndDur;
+    static volatile uint16_t sndDur;
     static volatile uint16_t scanLine;
-    static volatile uint16_t drawLine;
     static volatile uint16_t hLine;
+    static volatile uint8_t drawLine;
     static uint16_t sndFreq;
     static uint16_t vFrontPorch;
     static uint8_t skipLine;

@@ -39,11 +39,11 @@ void loop(){
     Serial.print(F("Insert a string of at most "));
     Serial.print(MAX_BUFLEN , DEC);
     Serial.println(F(" characters:"));
+    while (!Serial.available());
     while ((Serial.available()) && (buflen < MAX_BUFLEN)) {
       buff[buflen++] = Serial.read();
     }
     if (buflen > 0) state = quiero_mandar;
-    break;
   case quiero_mandar:
     SPI.beginTransaction(SPISettings (4000000 , MSBFIRST , SPI_MODE3));
     SET_SS_LOW();

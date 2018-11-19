@@ -64,7 +64,7 @@ void ardvga::begin(uint8_t height , uint8_t width , uint8_t doSplash /*añadir m
     for (uint8_t i=Blue;i<White;i++) setattr(0, i-1, Paper, i, PaperBright, InkBright);
     for (uint8_t i=Blue;i<=White;i++) setattr(0, i+6, Paper, i, PaperBright, 1);
   }
-  tone (NOTE_A4,1000);
+  //tone (NOTE_A4,1000);
 }
 void ardvga::end(){}
 void ardvga::setSkipLine(){
@@ -184,7 +184,7 @@ ISR (TIMER2_COMPB_vect){
   if (ardvga::drawLine){ //volver a usar doLine
     if (!ardvga::skipLine){
       uint8_t i = ardvga::horizontalChars;
-      uint8_t j = (ardvga::drawLine - 1) / 2;//volver a usar doLine, evitamos esta resta
+      uint8_t j = ardvga::drawLine / 2;
       uint8_t *attrPtr = ardvga::attributesBck + ((j/8) * i);
       uint8_t *bmskPtr = ardvga::bitmaskBck + (j * i);
       uint8_t aux = VGA_ATTRIBUTE_B_PIN;
@@ -210,7 +210,7 @@ ISR (TIMER2_COMPB_vect){
     }
     else if (ardvga::scanLine & 1){
       uint8_t i = ardvga::horizontalChars;
-      uint8_t j = ardvga::drawLine - 1; //este cuatro se puede calcular en función de verticalCharsBck
+      uint8_t j = ardvga::drawLine - 1; //volver a usar doLine para evitar la resta
       uint8_t *attrPtr = ardvga::attributesBck + ((j/8) * i);
       uint8_t *bmskPtr = ardvga::bitmaskBck + (j * i);
       uint8_t aux = VGA_ATTRIBUTE_B_PIN;

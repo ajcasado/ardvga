@@ -10,11 +10,14 @@
 ardvga mivga;
 
 void setup() {
-  mivga.begin(12,14,1);
+  mivga.begin(12,16,1); //107599 80939 56759 131112 106340 100155
+  soundoff2();
   mivga.setSkipLine();
   mivga.setMode_720();
-  mivga.tone (NOTE_A4,1000);
+  //mivga.tone (NOTE_A4,1000);
   mivga.delay(5000);
+
+
 }
 
 void loop() {
@@ -55,6 +58,7 @@ void loop() {
     mivga.print(buf);
     mivga.tone(noteTone , noteDuration);
     mivga.delay(noteDuration);
+    soundoff();
   }
   /*mivga.setSkipLine();
   mivga.ink(Black); mivga.paper(White); mivga.bPaper(1);mivga.bInk(0);mivga.ssa();

@@ -5,9 +5,9 @@
 #define PIN_MOSI 11
 #define PIN_MISO 12
 #define PIN_SCK 13
-#define PIN_RTR 6 //PD6
-#define SET_RTR_HIGH() PORTD |= (1 << PD6) // digitalWrite(PIN_SS , 1);
-#define SET_RTR_LOW() PORTD &= ~(1 << PD6) // digitalWrite(PIN_SS , 0);
+#define PIN_RTR 9 //PB1
+#define SET_RTR_HIGH() PORTD |= (1 << PB1) // digitalWrite(PIN_SS , 1);
+#define SET_RTR_LOW() PORTD &= ~(1 << PB1) // digitalWrite(PIN_SS , 0);
 
 #define MAX_BUFLEN 16
 #define START_TIMER() TIMSK1 |= (1 << OCIE1A) ; TCNT1 = 0  // enable timer compare interrupt, clear counter.
@@ -22,10 +22,11 @@ char buf[24] = {0};
 ardvga mivga;
 
 void setup(){
-  mivga.begin(12, 12, 0);
-  mivga.ink(inkCyan); mivga.paper(paperBlue); mivga.bPaper(noBright); mivga.bInk(brightInk);
-  sprintf_P(buf, PSTR("*SLAVE TEST*\n\0"));
+  mivga.begin(12, 14, 0);
+  mivga.ink(inkGreen); mivga.paper(paperGreen); mivga.bPaper(noBright); mivga.bInk(brightInk);
+  sprintf_P(buf, PSTR("__SLAVE TEST__\n\0"));
   mivga.print(buf);
+  mivga.ink(inkBlue); mivga.paper(paperWhite); mivga.bPaper(brightPaper); mivga.bInk(noBright);
   state = ocioso;
   pinMode (PIN_RTR , OUTPUT);
   /* Set MISO output, all others input */

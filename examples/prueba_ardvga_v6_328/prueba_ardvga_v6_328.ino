@@ -10,8 +10,8 @@
 ardvga mivga;
 
 void setup() {
-  mivga.begin(12,13,1);
-  //mivga.setSkipLine();
+  mivga.begin(12,14,1);
+  mivga.setSkipLine();
   mivga.setMode_720();
   mivga.tone (NOTE_A4,1000);
   mivga.delay(5000);

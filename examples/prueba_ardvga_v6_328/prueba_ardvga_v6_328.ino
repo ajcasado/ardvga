@@ -10,7 +10,7 @@
 ardvga mivga;
 
 void setup() {
-  mivga.begin(12,12,1);
+  mivga.begin(12,13,1);
   //mivga.setSkipLine();
   mivga.setMode_720();
   mivga.tone (NOTE_A4,1000);
@@ -43,7 +43,7 @@ void loop() {
       //putChar(((l*mivga.horizontalChars+c) % 95)+31, l, c); //ZX Charset
       mivga.putChar((l*mivga.getHChars()+c) & 0xff, l, c);//cp437 Charset
     }
-  mivga.delay(60000);
+  mivga.delay(10000);
   for (uint16_t thisNote = 0; thisNote < 53; thisNote++) {
     uint16_t noteDuration = ((2000) / mivga.safeReadFlashWord(noteDurations , thisNote));
     uint16_t noteTone = mivga.safeReadFlashWord(melody , thisNote);

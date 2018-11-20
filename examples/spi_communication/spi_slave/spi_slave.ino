@@ -97,7 +97,6 @@ void loop(){
   }
 }
 
-ISR (TIMER1_COMPA_vect){
-  sei();
+ISR (TIMER1_COMPA_vect , ISR_NOBLOCK){
   state = timeout;
 }

@@ -25,4 +25,6 @@ This is a personal project, the code is ugly and incomplete and bad commented.
 
 There are tested schematics for uno and nano boards based on atmega328p in the schematics folder.
 
- See in youtube :https://www.youtube.com/watch?v=gztOn4EnFPQ
+ See in youtube :
+ https://www.youtube.com/watch?v=gy4r95XHz44
+ https://www.youtube.com/watch?v=BLAV3MRPJYY

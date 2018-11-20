@@ -179,7 +179,7 @@ class ardvga{
     static void delay(uint32_t i);
     static uint32_t countLines();
     static uint16_t freeRam ();
-    static void tone (uint16_t frequency , uint32_t duration);
+    static void tone (uint16_t frequency , uint16_t duration);
     static void setSkipLine();
     static void setNoSkipLine();
     static void toggleSkipLine();
@@ -219,8 +219,8 @@ class ardvga{
     static volatile uint16_t hLine;
     static volatile uint8_t drawLine;
     static volatile uint8_t doLine;
-    static uint16_t sndFreq;
     static uint16_t vFrontPorch;
+    static uint8_t sndFreq;
     static uint8_t skipLine;
     static uint8_t *bitmask;
     static uint8_t *attributes;

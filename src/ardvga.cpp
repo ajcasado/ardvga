@@ -7,10 +7,11 @@
 /*cambiando el 2 debería poder hacer "PWM" y controlar el volumen de salida*/
 volatile uint8_t doLine = 0;
 volatile uint8_t ardvga::drawLine = 0;
-volatile uint16_t ardvga::scanLine = 0;
 volatile uint16_t ardvga::hLine = 0;
+volatile uint16_t ardvga::scanLine = 0;
 volatile uint16_t ardvga::sndDur = 0;
 volatile uint32_t ardvga::lineCounter = 0;
+uint8_t ardvga::sndFreq = 0;
 uint8_t ardvga::skipLine = 0;
 uint8_t* ardvga::bitmask = 0;
 uint8_t* ardvga::attributes = 0;
@@ -27,7 +28,6 @@ uint8_t ardvga::PaperBright = 0;
 uint8_t ardvga::hT = 0;
 uint8_t ardvga::xPos = 0;
 uint8_t ardvga::yPos = 0;
-uint16_t ardvga::sndFreq = 0;
 uint16_t ardvga::vFrontPorch = 0;
 
 void ardvga::begin(uint8_t height , uint8_t width , uint8_t doSplash /*añadir modo y hT como argumntos?*/){
@@ -240,7 +240,8 @@ ISR (TIMER2_COMPB_vect){
     else pixel_toff();
   }
   if (ardvga::sndDur){
-    if(ardvga::hLine++ > ardvga::sndFreq)
+    if (ardvga::scanLine & 7 ==0 ) ardvga::hLine++;
+    if(ardvga::hLine > ardvga::sndFreq) 
       ardvga::hLine=0;
     else
       if (ardvga::hLine > (ardvga::sndFreq / 2)) // (4/5) es el volumen
@@ -842,11 +843,10 @@ void ardvga::clearEllipseRect(int16_t x0, int16_t y0, int16_t x1, int16_t y1){
        cplot(x1+1, y1--);
    }
 }
-void ardvga::tone (uint16_t frequency,uint32_t duration){
-  if ((frequency > hFreq(hT)) || (frequency < 0)) return;
-  //sndDur=duration ;
+void ardvga::tone (uint16_t frequency,uint16_t duration){
+  if ((frequency > (hFreq(hT) / 8)) || (frequency < ((hFreq(hT) / 8 / 255)))) return;//implementar maxSFreq y minSfreqpúblicas y calcularlas en setResolution
   sndDur = (duration * vFreq(hT)) / 1000;
-  sndFreq = hFreq(hT) / frequency;
+  sndFreq = hFreq(hT) / frequency / 8;
   hLine = 0;
 }
 uint8_t ardvga::isDoingLine(){

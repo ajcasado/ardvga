@@ -5,7 +5,7 @@
 
       if (ardvga::hLine > (ardvga::sndFreq / 2/*^(255/vol) o (1<<vol)))*/
 /*cambiando el 2 debería poder hacer "PWM" y controlar el volumen de salida*/
-volatile uint8_t ardvga::doLine = 0;
+volatile uint8_t doLine = 0;
 volatile uint8_t ardvga::drawLine = 0;
 volatile uint16_t ardvga::scanLine = 0;
 volatile uint16_t ardvga::hLine = 0;
@@ -174,8 +174,8 @@ ISR (TIMER2_COMPB_vect){
     case 36: //Standard back porch in lines
       /*if (ardvga::mode == _720)*/
       ardvga::doLine = 1;
-      nop();
-      nop();
+      ardvga::drawLine = 0;
+      //nop();
       break;
     case 449:
       if (ardvga::mode == _720) ardvga::scanLine = 0;
@@ -234,7 +234,7 @@ ISR (TIMER2_COMPB_vect){
       nop();
       VGA_ATTRIBUTE_B_PORT &= ~VGA_ATTRIBUTE_B_MASK;
       VGA_ATTRIBUTE_PORT = BLANK;
-      if (ardvga::scanLine & 2)
+      if (ardvga::scanLine & 2) //Probar con &3 por si no cambia
         ardvga::drawLine++;
     }
     else pixel_toff();

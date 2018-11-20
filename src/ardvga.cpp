@@ -241,13 +241,13 @@ ISR (TIMER2_COMPB_vect){
   }
   if (ardvga::sndDur){
     if(ardvga::hLine > ardvga::sndFreq)
-      ardvga::hLine=0;
+      ardvga::hLine = 0;
     else
       if (ardvga::hLine > (ardvga::sndFreq / 2)) // (4/5) es el volumen
         soundoff();
       else
         soundon();
-    if (ardvga::scanLine & 7 ==0 ) ardvga::hLine++;
+    if (ardvga::scanLine & 7 == 0) ardvga::hLine++;
   }
   else{
     //gestionar buffer de sonido

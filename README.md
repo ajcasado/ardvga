@@ -15,7 +15,7 @@ The pixel output is used as the S input to a 74xx298 multiplexer to select the f
 
 The flash bit of the ZX attribute byte format is not used, instead i use one bright bit for paper and other bright bit for ink.
 
-A 6 resistor DAC is used to recreate the 1bit per channel RGB+BRIGHT color pallete of the ZX.(in the Harlequin clone transistors are used for a more ZX-accurate output of 15 colors).
+A 6 resistor DAC is used to recreate the 1bit per channel RGB+BRIGHT color pallette of the ZX.(in the Harlequin clone transistors are used for a more ZX-accurate output of 15 colors).
 
 Other modes can easily be achieved (8x4, 8x2 and 8x1 attribute modes).
 
@@ -25,4 +25,4 @@ This is a personal project, the code is ugly and incomplete and bad commented.
 
 There are tested schematics for uno and nano boards based on atmega328p in the schematics folder.
 
- (https://www.youtube.com/watch?v=gztOn4EnFPQ)
+ See in youtube :https://www.youtube.com/watch?v=gztOn4EnFPQ

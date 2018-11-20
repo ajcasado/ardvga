@@ -5,6 +5,7 @@
 
       if (ardvga::hLine > (ardvga::sndFreq / 2/*^(255/vol) o (1<<vol)))*/
 /*cambiando el 2 debería poder hacer "PWM" y controlar el volumen de salida*/
+volatile uint8_t doLine = 0;
 volatile uint8_t ardvga::drawLine = 0;
 volatile uint16_t ardvga::scanLine = 0;
 volatile uint16_t ardvga::hLine = 0;
@@ -172,7 +173,7 @@ ISR (TIMER2_COMPB_vect){
       break;*/
     case 36: //Standard back porch in lines
       /*if (ardvga::mode == _720)*/
-      ardvga::drawLine = 1;
+      ardvga::doLine = 1;
       nop();
       nop();
       break;
@@ -182,7 +183,7 @@ ISR (TIMER2_COMPB_vect){
     case 525:
       if (ardvga::mode == _640) ardvga::scanLine = 0;
   }
-  if (ardvga::drawLine){ //volver a usar doLine
+  if (ardvga::doLine){ 
     if (!ardvga::skipLine){
       uint8_t i = ardvga::horizontalChars;
       uint8_t j = ardvga::drawLine / 2;
@@ -243,15 +244,15 @@ ISR (TIMER2_COMPB_vect){
       ardvga::hLine=0;
     else
       if (ardvga::hLine > (ardvga::sndFreq / 2)) // (4/5) es el volumen
-        soundon();
-      else
         soundoff();
+      else
+        soundon();
   }
   else{
     //gestionar buffer de sonido
   }
   if (ardvga::scanLine++ == ardvga::vFrontPorch){
-    ardvga::drawLine = 0;
+    ardvga::doLine = 0;
     if (ardvga::sndDur) ardvga::sndDur--;
   }
 
@@ -850,5 +851,5 @@ void ardvga::tone (uint16_t frequency,uint32_t duration){
 }
 uint8_t ardvga::isDoingLine(){
   //return (ardvga::doLine && ((ardvga::skipLine && (ardvga::scanLine & 1)) || !(ardvga::skipLine)));
-  return ardvga::drawLine;
+  return ardvga::doLine;
 }

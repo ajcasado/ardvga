@@ -170,7 +170,7 @@ ISR (TIMER2_COMPB_vect){
       break;
     /*case 35: //Standard back porch in lines
       if (ardvga::mode == _640) ardvga::drawLine = 1;
-      break;*/
+      break;*/ //Surprisingly it works with the same line for both modes
     case 36: //Standard back porch in lines
       /*if (ardvga::mode == _720)*/
       ardvga::doLine = 1;
@@ -183,7 +183,7 @@ ISR (TIMER2_COMPB_vect){
     case 525:
       if (ardvga::mode == _640) ardvga::scanLine = 0;
   }
-  if (ardvga::doLine){ 
+  if (ardvga::doLine){
     if (!ardvga::skipLine){
       uint8_t i = ardvga::horizontalChars;
       uint8_t j = ardvga::drawLine / 2;
@@ -207,12 +207,12 @@ ISR (TIMER2_COMPB_vect){
       nop();
       VGA_ATTRIBUTE_B_PORT &= ~VGA_ATTRIBUTE_B_MASK;
       VGA_ATTRIBUTE_PORT = BLANK;
-      if ((ardvga::scanLine & 2) == 0) //repensar este test para evitar la división por 2 en el cálculo de j
+      if ((ardvga::scanLine & 2) == 0) // probar &3 quitando /2 de arriba
         ardvga::drawLine++;
     }
     else if (ardvga::scanLine & 1){
       uint8_t i = ardvga::horizontalChars;
-      uint8_t j = ardvga::drawLine - 1; //volver a usar doLine para evitar la resta
+      uint8_t j = ardvga::drawLine;
       uint8_t *attrPtr = ardvga::attributesBck + ((j/8) * i);
       uint8_t *bmskPtr = ardvga::bitmaskBck + (j * i);
       uint8_t aux = VGA_ATTRIBUTE_B_PIN;

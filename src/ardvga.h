@@ -218,6 +218,7 @@ class ardvga{
     static volatile uint16_t scanLine;
     static volatile uint16_t hLine;
     static volatile uint8_t drawLine;
+    static volatile uint8_t doLine;
     static uint16_t sndFreq;
     static uint16_t vFrontPorch;
     static uint8_t skipLine;

@@ -5,7 +5,7 @@
 
       if (ardvga::hLine > (ardvga::sndFreq / 2/*^(255/vol) o (1<<vol)))*/
 /*cambiando el 2 debería poder hacer "PWM" y controlar el volumen de salida*/
-volatile uint8_t doLine = 0;
+volatile uint8_t ardvga::doLine = 0;
 volatile uint8_t ardvga::drawLine = 0;
 volatile uint16_t ardvga::scanLine = 0;
 volatile uint16_t ardvga::hLine = 0;

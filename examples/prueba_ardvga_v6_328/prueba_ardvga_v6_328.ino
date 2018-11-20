@@ -42,7 +42,7 @@ void loop() {
 //  mivga.delay(60000);
   for (uint8_t l = 0; l < mivga.getVChars(); l++)
     for (uint8_t c = 0; c < mivga.getHChars(); c++) {
-      mivga.setattr(l, c, (l & 7) << 3, c & 7, (c & 1) << 6, (l & 1) << 6);
+      mivga.setattr(l, c, (l & 7) << 3, c & 7, (c & 1) << 6, (l & 1) << 7);
       //putChar(((l*mivga.horizontalChars+c) % 95)+31, l, c); //ZX Charset
       mivga.putChar((l*mivga.getHChars()+c) & 0xff, l, c);//cp437 Charset
     }

@@ -61,8 +61,9 @@ void ardvga::begin(uint8_t height , uint8_t width , uint8_t doSplash /*añadir m
     print(initMessage);
     sprintf_P(initMessage, PSTR("H.Freq:%uHz\n\0"), hFreq(hT));
     print(initMessage);
-    for (uint8_t i=Blue;i<White;i++) setattr(0, i-1, Paper, i, PaperBright, InkBright);
-    for (uint8_t i=Blue;i<=White;i++) setattr(0, i+6, Paper, i, PaperBright, 1);
+    InkBright = brightInk ;
+    for (uint8_t i=inkBlue;i<inkWhite;i++) setattr(0, i-1, Paper, i, PaperBright, InkBright);
+    for (uint8_t i=inkBlue;i<=inkWhite;i++) setattr(0, i+6, Paper, i, PaperBright, InkBright);
   }
   //tone (NOTE_A4,1000);
 }

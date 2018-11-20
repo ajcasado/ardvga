@@ -11,7 +11,6 @@ ardvga mivga;
 
 void setup() {
   mivga.begin(12,16,1); //107599 80939 56759 131112 106340 100155
-  soundoff2();
   mivga.setSkipLine();
   mivga.setMode_720();
   //mivga.tone (NOTE_A4,1000);

@@ -170,14 +170,14 @@ ISR (TIMER2_OVF_vect){
       V_SYNC_PORT &= VSYNC_PIN_DOWN_MASK;
       if (ardvga::sndDur) ardvga::sndDur--;
       break;
-      case 33: //return to std values
+      case 35: //return to std values
         if (ardvga::mode == _640)
           if(!ardvga::skipFrame){
             ardvga::doLine = 1; // usar drawline para hacer la funcion doline
             ardvga::drawLine = 0;
           }
         break;
-      case 34: //return to std values
+      case 36: //return to std values
         if (ardvga::mode == _720)
           if(!ardvga::skipFrame){
             ardvga::doLine = 1;

@@ -171,20 +171,22 @@ ISR (TIMER2_OVF_vect){
       if (ardvga::sndDur) ardvga::sndDur--;
       break;
       case 35:
-        if (ardvga::mode == _640)
+        if (ardvga::mode == _640){
           if(!ardvga::skipFrame){
             ardvga::doLine = 1; // usar drawline para hacer la funcion doline
             ardvga::drawLine = 0;
           }
           else  ardvga::skipFrame = 0;
+        }
         break;
       case 36:
-        if (ardvga::mode == _720)
+        if (ardvga::mode == _720){
           if(!ardvga::skipFrame){
             ardvga::doLine = 1;
             ardvga::drawLine = 0;
           }
           else  ardvga::skipFrame = 0;
+        }
       break;
     case 449:
       if (ardvga::mode == _720) ardvga::scanLine = 0;

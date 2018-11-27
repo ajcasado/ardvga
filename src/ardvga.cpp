@@ -7,6 +7,8 @@
 /*cambiando el 2 debería poder hacer "PWM" y controlar el volumen de salida*/
 volatile uint8_t ardvga::doLine = 0;
 volatile uint8_t ardvga::drawLine = 0;
+volatile uint8_t skipFrame = 0;
+volatile uint8_t frameSkipCounter = 0;
 volatile uint16_t ardvga::hLine = 0;
 volatile uint16_t ardvga::scanLine = 0;
 volatile uint16_t ardvga::sndDur = 0;
@@ -159,17 +161,19 @@ ISR (TIMER2_OVF_vect){
       V_SYNC_PORT &= VSYNC_PIN_DOWN_MASK;
       if (ardvga::sndDur) ardvga::sndDur--;
       break;
-    case 33: //Standard back porch in lines
-      if (ardvga::mode == _640) ardvga::drawLine = 1;
-      ardvga::doLine = 1;
-      ardvga::drawLine = 0;
+    case 33: //return to std values
+      if (ardvga::mode == _640) {
+        ardvga::doLine = 1; //
+        ardvga::drawLine = 0;
+      }
       break;
-    case 34:
-      if (ardvga::mode == _720)
-      ardvga::doLine = 1;
-      ardvga::drawLine = 0;
+    case 34: //return to std values
+      if (ardvga::mode == _720){
+        ardvga::doLine = 1;
+        ardvga::drawLine = 0;
+      }
       break;
-    case 446:
+    case 446: //return to std values
       if (ardvga::mode == _720) ardvga::scanLine = 0;
       break;
     case 525:
@@ -178,7 +182,7 @@ ISR (TIMER2_OVF_vect){
   pixel_ton();
   sei();
   sleep_mode ();
-}
+ }
 
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328P__)
 

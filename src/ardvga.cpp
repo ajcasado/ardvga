@@ -184,7 +184,7 @@ ISR (TIMER2_OVF_vect){
             ardvga::drawLine = 0;
           }
       break;
-    case 446: //return to std values
+    case 449: //return to std values
       if (ardvga::mode == _720) ardvga::scanLine = 0;
       break;
     case 525:

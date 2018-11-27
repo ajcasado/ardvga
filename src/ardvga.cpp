@@ -162,25 +162,25 @@ ISR (TIMER2_OVF_vect){
       if (ardvga::sndDur) ardvga::sndDur--;
       break;
     case 33:
-      if (ardvga::mode == _640) {
-        ardvga::doLine = 1; //
+      //if (ardvga::mode == _640) {
+        ardvga::doLine = 1;
         ardvga::drawLine = 0;
         nop();
-      }
+      //}
       break;
-    case 36:
+  /*  case 34:
       if (ardvga::mode == _720){
         ardvga::doLine = 1;
         ardvga::drawLine = 0;
         nop();
       }
-      break;
-    case 449:
+      break;*/
+    case 447:
       if (ardvga::mode == _720) {
         ardvga::scanLine = 0;
       }
       break;
-    case 525:
+    case 523:
       if (ardvga::mode == _640) {
         ardvga::scanLine = 0;
       }

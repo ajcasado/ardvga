@@ -15,6 +15,7 @@ void setup() {
   mivga.setMode_720();
   mivga.tone (NOTE_A4,1000);
   mivga.delay(5000);
+  mivga.setFrameSkip(2);
 
 
 }

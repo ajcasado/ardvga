@@ -176,7 +176,7 @@ ISR (TIMER2_OVF_vect){
             ardvga::doLine = 1; // usar drawline para hacer la funcion doline
             ardvga::drawLine = 0;
           }
-          else  ardvga::skipFrame = 0;
+          else ardvga::skipFrame = 0;
         }
         break;
       case 36:
@@ -185,7 +185,7 @@ ISR (TIMER2_OVF_vect){
             ardvga::doLine = 1;
             ardvga::drawLine = 0;
           }
-          else  ardvga::skipFrame = 0;
+          else ardvga::skipFrame = 0;
         }
       break;
     case 449:

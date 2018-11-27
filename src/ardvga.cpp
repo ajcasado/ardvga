@@ -2,13 +2,13 @@
 
 
 /*en linea 196:
-
       if (ardvga::hLine > (ardvga::sndFreq / 2/*^(255/vol) o (1<<vol)))*/
 /*cambiando el 2 debería poder hacer "PWM" y controlar el volumen de salida*/
 volatile uint8_t ardvga::doLine = 0;
 volatile uint8_t ardvga::drawLine = 0;
-volatile uint8_t skipFrame = 0;
-volatile uint8_t frameSkipCounter = 0;
+volatile uint8_t ardvga::skipFrame = 0;
+volatile uint8_t ardvga::frameSkipCounter = 0;
+volatile uint8_t ardvga::frameSkipLevel;
 volatile uint16_t ardvga::hLine = 0;
 volatile uint16_t ardvga::scanLine = 0;
 volatile uint16_t ardvga::sndDur = 0;
@@ -156,24 +156,33 @@ ISR (TIMER2_OVF_vect){
   switch(ardvga::scanLine){
     case 1:
       V_SYNC_PORT |= VSYNC_PIN_UP_MASK;
+      if (ardvga::frameSkipCounter){
+        ardvga::frameSkipCounter--;
+      }
+      else{
+        if (ardvga::frameSkipLevel){
+          ardvga::skipFrame = 1;
+          ardvga::frameSkipCounter = ardvga::frameSkipLevel;
+        }
+      }
       break;
     case 3:
       V_SYNC_PORT &= VSYNC_PIN_DOWN_MASK;
       if (ardvga::sndDur) ardvga::sndDur--;
       break;
-    case 35: //return to std values
-      if (ardvga::mode == _640) {
-        ardvga::doLine = 1; //
-        ardvga::drawLine = 0;
-        nop();
-      }
-      break;
-    case 36: //return to std values
-      if (ardvga::mode == _720){
-        ardvga::doLine = 1;
-        ardvga::drawLine = 0;
-        nop();
-      }
+      case 33: //return to std values
+        if (ardvga::mode == _640)
+          if(!ardvga::skipFrame){
+            ardvga::doLine = 1; // usar drawline para hacer la funcion doline
+            ardvga::drawLine = 0;
+          }
+        break;
+      case 34: //return to std values
+        if (ardvga::mode == _720)
+          if(!ardvga::skipFrame){
+            ardvga::doLine = 1;
+            ardvga::drawLine = 0;
+          }
       break;
     case 446: //return to std values
       if (ardvga::mode == _720) ardvga::scanLine = 0;
@@ -371,16 +380,13 @@ ISR (TIMER2_COMPB_vect){
 #endif
 
 /*#if defined(__AVR_ATmega644__) || defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284P__)
-
   void ardvga::setupIO() {
-
     VGA_SYNC_CR |= (1 << VSYNC_PIN) | (1 << HSYNC_PIN);
     VGA_PIXEL_CR |= (1 << VGA_PIXEL_PIN) | (1 << VGA_CLOCK_PIN);
     VGA_ATTRIBUTE_CR = B11111111;
     SOUNDPORTCR |= (1<<SOUNDPIN);
     soundoff();
   }
-
   void ardvga::setCRTCTRL(uint8_t ht){
     cli();
     TIMSK0 = 0;
@@ -396,8 +402,6 @@ ISR (TIMER2_COMPB_vect){
     UCSR1C = bit (UMSEL10) | bit (UMSEL11) | bit (UCPHA1) | bit (UCPOL1);  // Master SPI mode   //XXX
     sei();
 }
-
-
     void ardvga::lineProc_skipLine()
     {
       if (scanLine++ & 1){
@@ -437,7 +441,6 @@ ISR (TIMER2_COMPB_vect){
       }
       else soundoff();
     }
-
     void ardvga::lineProc_noskipLine()
     {
         if (doLine){
@@ -475,7 +478,6 @@ ISR (TIMER2_COMPB_vect){
         }
         else soundoff();
     }
-
     void ardvga::loadzxscr(const uint8_t scrBitmaps[] PROGMEM , const uint8_t scrAttributes [] PROGMEM ) {
       Ink = Black; Paper = Black; PaperBright=0,InkBright=0; ssa();
       uint16_t k=0;
@@ -522,20 +524,17 @@ ISR (TIMER2_COMPB_vect){
     void ardvga::ssa() {
       memset(attributes, ((((InkBright)&1) << 7) | (((PaperBright)&1) << 6) | (Paper << 3) | (Ink)), aMemSize);
     }
-
     bool ardvga::setattr(uint8_t line, uint8_t column, uint8_t paper, uint8_t ink, uint8_t paperbright, uint8_t inkbright){
       if ((column < 0) || ((column > horizontalChars - 1))) return 1;
       if ((line < 0) || ((line > verticalChars - 1))) return 1;
       attributes[line][column] = ((((inkbright)&1) << 7) | (((paperbright)&1) << 6) | (paper << 3) | (ink));
       return 0;
     }
-
     void ardvga::scrollau( uint8_t i) {
       if (i > verticalChars) i = verticalChars;
       memmove(&attributes[0][0], &attributes[i][0], aMemSize - horizontalChars * i);
       memset(&attributes[verticalChars - 1 * i][0], ((((InkBright)&1) << 7) | (((PaperBright)&1) << 6) | (Paper << 3) | (Ink)), horizontalChars * i);
     }
-
 #endif*/
 void ardvga::cls() {
   ardvga::clb();
@@ -857,4 +856,11 @@ void ardvga::tone (uint16_t frequency,uint16_t duration){
 uint8_t ardvga::isDoingLine(){
   //return (ardvga::doLine && ((ardvga::skipLine && (ardvga::scanLine & 1)) || !(ardvga::skipLine)));
   return ardvga::doLine;
+}
+void ardvga::setFrameSkip(uint8_t fsLevel){
+  ardvga::frameSkipLevel = fsLevel;
+  ardvga::frameSkipCounter = fsLevel;
+}
+uint8_t ardvga::getFrameSkip(){
+  return ardvga::frameSkipLevel;
 }

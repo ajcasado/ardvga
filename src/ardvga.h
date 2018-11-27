@@ -209,10 +209,14 @@ class ardvga{
     friend void TIMER2_OVF_vect(void);
     friend void TIMER2_COMPB_vect(void);
     static uint8_t isDoingLine();
+    static void setFrameSkip(uint8_t fsLevel);
+    static uint8_t getFrameSkip();
 
 
 	private:
-
+    static volatile uint8_t frameSkipCounter;
+    static volatile uint8_t frameSkipLevel;
+    static volatile uint8_t skipFrame;
     static volatile uint32_t lineCounter;
     static volatile uint16_t sndDur;
     static volatile uint16_t scanLine;

@@ -161,16 +161,18 @@ ISR (TIMER2_OVF_vect){
       V_SYNC_PORT &= VSYNC_PIN_DOWN_MASK;
       if (ardvga::sndDur) ardvga::sndDur--;
       break;
-    case 33: //return to std values
+    case 35: //return to std values
       if (ardvga::mode == _640) {
         ardvga::doLine = 1; //
         ardvga::drawLine = 0;
+        nop();
       }
       break;
-    case 34: //return to std values
+    case 36: //return to std values
       if (ardvga::mode == _720){
         ardvga::doLine = 1;
         ardvga::drawLine = 0;
+        nop();
       }
       break;
     case 446: //return to std values

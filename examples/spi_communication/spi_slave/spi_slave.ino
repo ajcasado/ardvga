@@ -6,8 +6,8 @@
 #define PIN_MISO 12
 #define PIN_SCK 13
 #define PIN_RTR 9 //PB1
-#define SET_RTR_HIGH() PORTD |= (1 << PB1) // digitalWrite(PIN_SS , 1);
-#define SET_RTR_LOW() PORTD &= ~(1 << PB1) // digitalWrite(PIN_SS , 0);
+#define SET_RTR_HIGH() PORTB |= (1 << PB1) // digitalWrite(PIN_SS , 1);
+#define SET_RTR_LOW() PORTB &= ~(1 << PB1) // digitalWrite(PIN_SS , 0);
 
 #define MAX_BUFLEN 16
 #define START_TIMER() TIMSK1 |= (1 << OCIE1A) ; TCNT1 = 0  // enable timer compare interrupt, clear counter.
@@ -24,16 +24,18 @@ ardvga mivga;
 void setup(){
   mivga.begin(12, 14, 0);
   mivga.ink(inkGreen); mivga.paper(paperGreen); mivga.bPaper(noBright); mivga.bInk(brightInk);
-  sprintf_P(buf, PSTR("__SLAVE TEST__\n\0"));
+  sprintf_P(buf, PSTR("<<SLAVE TEST>>\n\0"));
   mivga.print(buf);
   mivga.ink(inkBlue); mivga.paper(paperWhite); mivga.bPaper(brightPaper); mivga.bInk(noBright);
   state = ocioso;
   pinMode (PIN_RTR , OUTPUT);
   /* Set MISO output, all others input */
   pinMode (PIN_MISO , OUTPUT);
-  pinMode (PIN_MOSI , INPUT_PULLUP);
-  pinMode (PIN_SCK , INPUT_PULLUP);
-  pinMode (PIN_SS , INPUT_PULLUP);
+  digitalWrite(PIN_RTR,1);
+  digitalWrite(PIN_MISO,1);
+  pinMode (PIN_MOSI , INPUT);
+  pinMode (PIN_SCK , INPUT);
+  pinMode (PIN_SS , INPUT);
   /* Enable SPI in Slave mode, mode 3 , MSBFIRST  (clock speed driven by master)*/
   SPCR = (1<<SPE) | (1<<CPOL) | (1<<CPHA);
   //set timer1 interrupt at 1Hz -amandaghassaei https://www.instructables.com/id/Arduino-Timer-Interrupts/)

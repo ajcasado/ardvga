@@ -10,24 +10,26 @@
 #define SET_RTR_LOW() PORTB &= ~(1 << PB1) // digitalWrite(PIN_SS , 0);
 
 #define MAX_BUFLEN 16
-#define START_TIMER() TIMSK1 |= (1 << OCIE1A) ; TCNT1 = 0  // enable timer compare interrupt, clear counter.
-#define STOP_TIMER() TIMSK1 &= ~(1 << OCIE1A)
+#define START_TIMER() TCNT1 = 0 ; TCCR1B |= (1 << CS12) | (1 << CS10)   // enable timer with 1024 prescaler, clear counter.
+#define STOP_TIMER() TCCR1B &= ~(1 << CS12) & ~(1 << CS10) // disable timer.
 
 typedef enum states {ocioso, puedo_recibir, recibo_byte, proceso_mensaje, buffer_overrun, timeout} state_t;
 
 volatile state_t state;
 char buff[MAX_BUFLEN] = {0};
 char buf[24] = {0};
+uint8_t buflen , i;
 
 ardvga mivga;
 
 void setup(){
-  mivga.begin(12, 14, 0);
+  mivga.begin(12, 16, 0);
+  mivga.setSkipLine();
   mivga.ink(inkGreen); mivga.paper(paperGreen); mivga.bPaper(noBright); mivga.bInk(brightInk);
-  sprintf_P(buf, PSTR("<<SLAVE TEST>>\n\0"));
+  mivga.cls();
+  sprintf_P(buf, PSTR("<<<SLAVE TEST>>>\n\0"));
   mivga.print(buf);
   mivga.ink(inkBlue); mivga.paper(paperWhite); mivga.bPaper(brightPaper); mivga.bInk(noBright);
-  state = ocioso;
   pinMode (PIN_RTR , OUTPUT);
   /* Set MISO output, all others input */
   pinMode (PIN_MISO , OUTPUT);
@@ -41,19 +43,20 @@ void setup(){
   //set timer1 interrupt at 1Hz -amandaghassaei https://www.instructables.com/id/Arduino-Timer-Interrupts/)
   TCCR1A = 0;// set entire TCCR1A register to 0
   TCCR1B = 0;// same for TCCR1B
-  TCNT1  = 0;//initialize counter value to 0
+  TIMSK1 = (1 << OCIE1A);// enable timer compare interrupt
   // set compare match register for 1hz increments
-  OCR1A = 15624;// = (16*10^6) / (1*1024) - 1 (must be <65536)
+  OCR1A = (F_CPU / 1024) -1;//15624;// = (16*10^6) / (1*1024) - 1 (must be <65536)
   // turn on CTC mode
-  TCCR1B |= (1 << WGM12);
-  // Set CS10 and CS12 bits for 1024 prescaler
-  TCCR1B |= (1 << CS12) | (1 << CS10);
+  TCCR1B |= (1 << WGM12);//CTC mode
+  TIFR1 |= (1<<OCF1A); //clear interrupt flag
+  state = ocioso;
 }
 
 void loop(){
-  uint8_t buflen , i;
   switch (state) {
   case ocioso:
+    sprintf_P(buf, PSTR("O\0"));
+    mivga.print(buf);
     STOP_TIMER();
     SET_RTR_HIGH();
     buflen = 0;
@@ -61,12 +64,16 @@ void loop(){
     while (GET_SS_VALUE() > 0);
     state = puedo_recibir;
   case puedo_recibir:
+    sprintf_P(buf, PSTR("P\0"));
+    mivga.print(buf);
     SET_RTR_LOW();
     START_TIMER();
     while ((SPIF == 0) && (state != timeout));
     if (state == timeout) break;
     state = recibo_byte;
   case recibo_byte:
+    sprintf_P(buf, PSTR("R\0"));
+    mivga.print(buf);
     SET_RTR_HIGH();
     buff[buflen++] = SPDR;
     if (buflen > MAX_BUFLEN){
@@ -79,11 +86,13 @@ void loop(){
     }
     state = proceso_mensaje;
   case proceso_mensaje:
+    sprintf_P(buf, PSTR("PM\n\0"));
+    mivga.print(buf);
     buff[buflen] = 0;
-    sprintf_P(buf, PSTR("Received message:\n\0"));
+    sprintf_P(buf, PSTR("Received message\n\0"));
     mivga.print(buf);
     mivga.print(buff);
-    sprintf_P(buf , PSTR("\nReceived bytes: %u\n\0") , buflen);
+    sprintf_P(buf , PSTR("Received bytes:%u\n\0") , buflen);
     mivga.print(buf);
     state = ocioso;
     break;

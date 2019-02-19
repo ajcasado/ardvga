@@ -35,10 +35,9 @@ void setup(){
   TIFR1 |= (1<<OCF1A); //clear interrupt flag
   state = ocioso;
 }
-void loop(){
+void loop(){ //hacer función para transferencia y dejar en loop solamente entrada de texto y llamada a función
   switch (state) {
   case ocioso:
-    Serial.print(F("O\n"));
     SET_SS_HIGH();
     STOP_TIMER();
     i = 0;
@@ -53,35 +52,30 @@ void loop(){
     Serial.print(F("Sending:"));
     Serial.println(buff);
     Serial.println(buflen);
-    //if (buflen > 0) state = quiero_mandar;
-    state = quiero_mandar;
-  case quiero_mandar:
-    Serial.print(F("Q\n"));
-    SPI.beginTransaction(SPISettings (4000000 , MSBFIRST , SPI_MODE3));
+  case quiero_mandar://este estado no se usa -> quitar
+    SPI.beginTransaction(SPISettings (250000 , MSBFIRST , SPI_MODE3));
     SET_SS_LOW();
     START_TIMER();
-    while ((GET_RTR_VALUE() > 0) && (state != timeout)){
-    }
+    while ((GET_RTR_VALUE() > 0) && (state != timeout));
     if (state == timeout) break;
-    state = mando_byte;
   case mando_byte:
-    Serial.print(F("M\n"));
-    SET_SS_HIGH();//this resets the SPI buffer on the slave to synchronize byte transfer
+//    SET_SS_HIGH();//this resets the SPI buffer on the slave to synchronize byte transfer
 //    nop();
 //    nop(); //Keep SS HIGH for 4 cycles to make effect on slave
-    SET_SS_LOW();
+//    SET_SS_LOW();
+    cli(); //avoid delay setting SS HIGH
     SPI.transfer(buff[i++]); //I guess from SPI library source that this is a blocking transfer
-    while ((GET_RTR_VALUE() == 0) && (state != timeout));
-    if (state == timeout) break;
-    state = byte_mandado;
-  case byte_mandado:
-    Serial.print(F("B\n"));
     if (--buflen == 0){
+      SET_SS_HIGH();
+      sei();
       SPI.endTransaction();
       state = ocioso;
       break;
     }
-    Serial.println(buflen);
+    sei();
+    while ((GET_RTR_VALUE() == 0) && (state != timeout));
+    if (state == timeout) break;
+  case byte_mandado://este estado no se usa -> quitar
     while ((GET_RTR_VALUE() > 0) && (state != timeout));
     if (state == timeout) break;
     state = mando_byte;

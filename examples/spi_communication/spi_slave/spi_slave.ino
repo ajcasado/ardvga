@@ -55,25 +55,19 @@ void setup(){
 void loop(){
   switch (state) {
   case ocioso:
-    sprintf_P(buf, PSTR("O\0"));
-    mivga.print(buf);
     STOP_TIMER();
     SET_RTR_HIGH();
-    buflen = 0;
+    buflen = SPSR; //Clear SPIF
+    buflen = SPDR; //Clear SPIF (datasheet)
+    buflen = 0; // init buflen
     memset(buff, 0, MAX_BUFLEN);
     while (GET_SS_VALUE() > 0);
-    state = puedo_recibir;
   case puedo_recibir:
-    sprintf_P(buf, PSTR("P\0"));
-    mivga.print(buf);
     SET_RTR_LOW();
     START_TIMER();
-    while ((SPIF == 0) && (state != timeout));
+    while ((!(SPSR & (1<<SPIF))) && (state != timeout));
     if (state == timeout) break;
-    state = recibo_byte;
-  case recibo_byte:
-    sprintf_P(buf, PSTR("R\0"));
-    mivga.print(buf);
+  case recibo_byte://este estado no se usa -> quitar
     SET_RTR_HIGH();
     buff[buflen++] = SPDR;
     if (buflen > MAX_BUFLEN){
@@ -84,10 +78,7 @@ void loop(){
       state = puedo_recibir;
       break;
     }
-    state = proceso_mensaje;
-  case proceso_mensaje:
-    sprintf_P(buf, PSTR("PM\n\0"));
-    mivga.print(buf);
+  case proceso_mensaje://este estado no se usa -> quitar
     buff[buflen] = 0;
     sprintf_P(buf, PSTR("Received message\n\0"));
     mivga.print(buf);
@@ -99,15 +90,19 @@ void loop(){
   case buffer_overrun:
     sprintf_P(buf, PSTR("BUFFER OVERRUN!\n\0"));
     mivga.print(buf);
+    sprintf_P(buf, PSTR("%u\n\0"),buflen);
+    mivga.print(buf);
     state = ocioso;
     break;
   case timeout:
     sprintf_P(buf, PSTR("TIMEOUT!\n\0"));
     mivga.print(buf);
+    sprintf_P(buf, PSTR("%u\n\0"),SPDR);
+    mivga.print(buf);
     state = ocioso;
   }
 }
 
-ISR (TIMER1_COMPA_vect , ISR_NOBLOCK){
+ISR (TIMER1_COMPA_vect /*, ISR_NOBLOCK*/){
   state = timeout;
 }

@@ -5,12 +5,12 @@
 #define SET_SS_LOW() PORTB &= ~(1 << PB2) //digitalWrite(PIN_SS , 0)
 #define PIN_RTR 6 //PD6
 #define GET_RTR_VALUE() (PIND & (1<<PD6)) //digitalRead(PIN_RTR)// 0 for LOW or > 0 for HIGH
-#define MAX_BUFLEN 16
+#define MAX_BUFLEN 32
 #define START_TIMER() TCNT1 = 0 ; TCCR1B |= (1 << CS12) | (1 << CS10)   // enable timer with 1024 prescaler, clear counter.
 #define STOP_TIMER() TCCR1B &= ~(1 << CS12) & ~(1 << CS10) // disable timer.
 #define nop() __asm__("nop\n\t") //Wait one clock cycle
-typedef enum states {ocioso, quiero_mandar, mando_byte, byte_mandado, timeout} state_t;
-volatile state_t state;
+
+volatile uint8_t timeoutflag = 0;
 char buff[MAX_BUFLEN] = {0};
 uint8_t buflen , i;
 
@@ -33,11 +33,9 @@ void setup(){
   // turn on CTC mode
   TCCR1B |= (1 << WGM12);//CTC mode
   TIFR1 |= (1<<OCF1A); //clear interrupt flag
-  state = ocioso;
 }
 void loop(){ //hacer función para transferencia y dejar en loop solamente entrada de texto y llamada a función
-  switch (state) {
-  case ocioso:
+  ocioso:
     SET_SS_HIGH();
     STOP_TIMER();
     i = 0;
@@ -49,16 +47,16 @@ void loop(){ //hacer función para transferencia y dejar en loop solamente entra
     while ((Serial.available()) && (buflen < MAX_BUFLEN)) {
       buff[buflen++] = Serial.read();
     }
+    buff[buflen] = 0;
     Serial.print(F("Sending:"));
     Serial.println(buff);
     Serial.println(buflen);
-  case quiero_mandar://este estado no se usa -> quitar
     SPI.beginTransaction(SPISettings (250000 , MSBFIRST , SPI_MODE3));
     SET_SS_LOW();
     START_TIMER();
-    while ((GET_RTR_VALUE() > 0) && (state != timeout));
-    if (state == timeout) break;
-  case mando_byte:
+  mando_byte:
+    while (GET_RTR_VALUE() && !timeoutflag);
+    if (timeoutflag) goto timeout;
 //    SET_SS_HIGH();//this resets the SPI buffer on the slave to synchronize byte transfer
 //    nop();
 //    nop(); //Keep SS HIGH for 4 cycles to make effect on slave
@@ -69,23 +67,23 @@ void loop(){ //hacer función para transferencia y dejar en loop solamente entra
       SET_SS_HIGH();
       sei();
       SPI.endTransaction();
-      state = ocioso;
-      break;
+      goto ocioso;
     }
     sei();
-    while ((GET_RTR_VALUE() == 0) && (state != timeout));
-    if (state == timeout) break;
-  case byte_mandado://este estado no se usa -> quitar
-    while ((GET_RTR_VALUE() > 0) && (state != timeout));
-    if (state == timeout) break;
-    state = mando_byte;
-    break;
-  case timeout:
+//    SET_SS_HIGH();//this resets the SPI buffer on the slave to synchronize byte transfer
+//    nop();
+//    nop(); //Keep SS HIGH for 4 cycles to make effect on slave
+//    SET_SS_LOW();
+    while (!GET_RTR_VALUE() && !timeoutflag);
+//    while (GET_RTR_VALUE() && !timeoutflag);
+    if (timeoutflag) goto timeout;
+    goto mando_byte;
+  timeout:
     SPI.endTransaction();
     Serial.println(F("TIMEOUT!"));
-    state = ocioso;
-  }
+    timeoutflag = 0;
+    goto ocioso;
 }
 ISR (TIMER1_COMPA_vect){
-  state = timeout;
+  timeoutflag =1;
 }

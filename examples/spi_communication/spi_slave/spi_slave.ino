@@ -9,13 +9,16 @@
 #define SET_RTR_HIGH() PORTB |= (1 << PB1) // digitalWrite(PIN_SS , 1);
 #define SET_RTR_LOW() PORTB &= ~(1 << PB1) // digitalWrite(PIN_SS , 0);
 
-#define MAX_BUFLEN 16
+#define MAX_BUFLEN 32
 #define START_TIMER() TCNT1 = 0 ; TCCR1B |= (1 << CS12) | (1 << CS10)   // enable timer with 1024 prescaler, clear counter.
 #define STOP_TIMER() TCCR1B &= ~(1 << CS12) & ~(1 << CS10) // disable timer.
+//
+//typedef enum states {ocioso, puedo_recibir, /*recibo_byte, proceso_mensaje,*/ buffer_overrun, timeout} state_t;
+//
+//volatile state_t state;
 
-typedef enum states {ocioso, puedo_recibir, recibo_byte, proceso_mensaje, buffer_overrun, timeout} state_t;
+volatile uint8_t timeoutflag = 0;
 
-volatile state_t state;
 char buff[MAX_BUFLEN] = {0};
 char buf[24] = {0};
 uint8_t buflen , i;
@@ -49,60 +52,52 @@ void setup(){
   // turn on CTC mode
   TCCR1B |= (1 << WGM12);//CTC mode
   TIFR1 |= (1<<OCF1A); //clear interrupt flag
-  state = ocioso;
+//  state = ocioso;
 }
 
 void loop(){
-  switch (state) {
-  case ocioso:
+  ocioso:
     STOP_TIMER();
     SET_RTR_HIGH();
     buflen = SPSR; //Clear SPIF
     buflen = SPDR; //Clear SPIF (datasheet)
     buflen = 0; // init buflen
     memset(buff, 0, MAX_BUFLEN);
-    while (GET_SS_VALUE() > 0);
-  case puedo_recibir:
-    SET_RTR_LOW();
+    while (GET_SS_VALUE());
     START_TIMER();
-    while ((!(SPSR & (1<<SPIF))) && (state != timeout));
-    if (state == timeout) break;
-  case recibo_byte://este estado no se usa -> quitar
+  puedo_recibir:
+    SET_RTR_LOW();
+    while (!(SPSR & (1<<SPIF)) && !timeoutflag);
+    if (timeoutflag) goto timeout;
     SET_RTR_HIGH();
+    for (uint16_t wait = 0 ; wait < 2 ; wait++){
+      nop();
+    }
     buff[buflen++] = SPDR;
-    if (buflen > MAX_BUFLEN){
-      state = buffer_overrun;
-      break;
-    }
-    if (GET_SS_VALUE() == 0){
-      state = puedo_recibir;
-      break;
-    }
-  case proceso_mensaje://este estado no se usa -> quitar
+    if (buflen > MAX_BUFLEN) goto buffer_overrun;
+    if (!GET_SS_VALUE()) goto puedo_recibir;
     buff[buflen] = 0;
     sprintf_P(buf, PSTR("Received message\n\0"));
     mivga.print(buf);
     mivga.print(buff);
     sprintf_P(buf , PSTR("Received bytes:%u\n\0") , buflen);
     mivga.print(buf);
-    state = ocioso;
-    break;
-  case buffer_overrun:
+    goto ocioso;
+  buffer_overrun:
     sprintf_P(buf, PSTR("BUFFER OVERRUN!\n\0"));
     mivga.print(buf);
     sprintf_P(buf, PSTR("%u\n\0"),buflen);
     mivga.print(buf);
-    state = ocioso;
-    break;
-  case timeout:
+    goto ocioso;
+  timeout:
     sprintf_P(buf, PSTR("TIMEOUT!\n\0"));
     mivga.print(buf);
     sprintf_P(buf, PSTR("%u\n\0"),SPDR);
     mivga.print(buf);
-    state = ocioso;
-  }
+    timeoutflag = 0;
+    goto ocioso;
 }
 
 ISR (TIMER1_COMPA_vect /*, ISR_NOBLOCK*/){
-  state = timeout;
+  timeoutflag = 1;
 }

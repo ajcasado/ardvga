@@ -9,7 +9,7 @@
 #define SET_RTR_HIGH() PORTB |= (1 << PB1) // digitalWrite(PIN_SS , 1);
 #define SET_RTR_LOW() PORTB &= ~(1 << PB1) // digitalWrite(PIN_SS , 0);
 
-#define MAX_BUFLEN 32
+#define MAX_BUFLEN 64
 #define START_TIMER() TCNT1 = 0 ; TCCR1B |= (1 << CS12) | (1 << CS10)   // enable timer with 1024 prescaler, clear counter.
 #define STOP_TIMER() TCCR1B &= ~(1 << CS12) & ~(1 << CS10) // disable timer.
 //
@@ -22,12 +22,13 @@ volatile uint8_t timeoutflag = 0;
 char buff[MAX_BUFLEN] = {0};
 char buf[24] = {0};
 uint8_t buflen , i;
+uint8_t wait;
 
 ardvga mivga;
 
 void setup(){
   mivga.begin(12, 16, 0);
-  mivga.setSkipLine();
+  mivga.setNoSkipLine();//ver porqué si hay skipline o no se mueve la pantalla a izquierda o derecha
   mivga.ink(inkGreen); mivga.paper(paperGreen); mivga.bPaper(noBright); mivga.bInk(brightInk);
   mivga.cls();
   sprintf_P(buf, PSTR("<<<SLAVE TEST>>>\n\0"));
@@ -36,8 +37,8 @@ void setup(){
   pinMode (PIN_RTR , OUTPUT);
   /* Set MISO output, all others input */
   pinMode (PIN_MISO , OUTPUT);
-  digitalWrite(PIN_RTR,1);
-  digitalWrite(PIN_MISO,1);
+  digitalWrite(PIN_RTR , HIGH);
+  digitalWrite(PIN_MISO , HIGH);
   pinMode (PIN_MOSI , INPUT);
   pinMode (PIN_SCK , INPUT);
   pinMode (PIN_SS , INPUT);
@@ -57,6 +58,7 @@ void setup(){
 
 void loop(){
   ocioso:
+    mivga.setNoSkipLine();
     STOP_TIMER();
     SET_RTR_HIGH();
     buflen = SPSR; //Clear SPIF
@@ -64,23 +66,24 @@ void loop(){
     buflen = 0; // init buflen
     memset(buff, 0, MAX_BUFLEN);
     while (GET_SS_VALUE());
+    mivga.setSkipLine();
     START_TIMER();
   puedo_recibir:
     SET_RTR_LOW();
     while (!(SPSR & (1<<SPIF)) && !timeoutflag);
     if (timeoutflag) goto timeout;
     SET_RTR_HIGH();
-    for (uint16_t wait = 0 ; wait < 2 ; wait++){
+    for (wait = 0 ; wait < 26 ; wait++){
       nop();
     }
     buff[buflen++] = SPDR;
     if (buflen > MAX_BUFLEN) goto buffer_overrun;
     if (!GET_SS_VALUE()) goto puedo_recibir;
     buff[buflen] = 0;
-    sprintf_P(buf, PSTR("Received message\n\0"));
+    sprintf_P(buf, PSTR("Received message:\n\0"));
     mivga.print(buf);
     mivga.print(buff);
-    sprintf_P(buf , PSTR("Received bytes:%u\n\0") , buflen);
+    sprintf_P(buf , PSTR("\nReceived bytes:%u\n\0") , buflen);
     mivga.print(buf);
     goto ocioso;
   buffer_overrun:

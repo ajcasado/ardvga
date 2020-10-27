@@ -39,8 +39,8 @@ There are tested schematics for uno and nano boards based on atmega328p in the s
  
  -Set resolution in begin() call in chars (8x8px).
  
- -Define MODE_720 od MODE_640 in ardvga.h to select vga mode 720x400 or 640x480
+ -Define MODE_720 or MODE_640 in ardvga.h to select vga mode 720x400 or 640x480
  
- -Define EFFECT_SCANLINE or NO_EFFECT_SCANLINE to configure the scanline effect. With scanline activated runs faster.
+ -Define EFFECT_SCANLINE or NO_EFFECT_SCANLINE in ardvga.h to configure the scanline effect. With scanline activated runs faster.
  
 VIDEO: https://youtu.be/EQStUlc8NUM

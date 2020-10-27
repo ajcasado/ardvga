@@ -31,9 +31,9 @@ There are tested schematics for uno and nano boards based on atmega328p in the s
  
  Last update, 1284p branch: 
  
- -Running on ATmega1284p with MCUdude MightyCore loaded.
+ -Running on ATmega1284p with MCUdude MightyCore for Arduino loaded. To use this chip on a breadboard see https://maniacbug.wordpress.com/2011/11/27/arduino-on-atmega1284p-4/
  
- -Clock is 27Mhz.
+ -Clock is a four pin oscillator at 27Mhz.
  
  -Example runs at 256x192px. Can run at 328x240.
  

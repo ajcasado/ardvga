@@ -20,31 +20,30 @@
 
   #define MCU_1284
 
+  #define V_PIXEL_SCALE 2
   #define UCPHA1 1 /*not defined in maniacbug files, search for better support for this chip*/
   #define pixel_ton() UCSR1B = bit (TXEN1)
   #define pixel_toff() UCSR1B = 0
-  #define PIXEL_DR UDR0
+  #define PIXEL_DR UDR1
   //#define _720 48149
   //#define _640 56281
-  #define VGA_SYNC_CR DDRD
-  #define VGA_SYNC_PORT PORTD
-  #define VSYNC_PIN PD5
-  #define VSYNC_PIN_UP_MASK B00100000 //calcular a partir de VSYNC_PIN
-  #define VSYNC_PIN_DOWN_MASK B11011111 //calcular a partir de VSYNC_PIN
+  #define H_SYNC_CR DDRD
+  #define H_SYNC_PORT PORTD
   #define HSYNC_PIN PD6
+  #define V_SYNC_CR DDRD
+  #define V_SYNC_PORT PORTD
+  #define VSYNC_PIN PD5
   #define VGA_PIXEL_CR DDRD
   #define VGA_PIXEL_PORT PORTD
   #define VGA_PIXEL_PIN PD3
   #define VGA_CLOCK_PIN PD4
   #define VGA_ATTRIBUTE_CR DDRC
   #define VGA_ATTRIBUTE_PORT PORTC
-  #define SOUNDPORT PORTA //hacer opcional la compilacion del sonido
-  #define SOUNDPORTCR DDRA
-  #define SOUNDPIN PA0
-  #define soundoff() SOUNDPORT &= ~(1<<SOUNDPIN) //check if is calculated at compile time
-  #define soundon() SOUNDPORT |= (1<<SOUNDPIN)
-  #define horizontalChars 32
-  #define verticalChars 24
+  #define SOUNDPORT PORTB //hacer opcional la compilacion del sonido
+  #define SOUNDPORTCR DDRB
+  #define SOUNDPIN PB0
+  //#define horizontalChars 32
+  //#define verticalChars 24
 
 #endif
 
@@ -52,6 +51,7 @@
 
   #define MCU_328
 
+  #define V_PIXEL_SCALE 4
   #define pixel_ton() UCSR0B = (1<<TXEN0)
   #define pixel_toff() UCSR0B = 0
   #define PIXEL_DR UDR0
@@ -61,8 +61,6 @@
   #define V_SYNC_CR DDRB
   #define V_SYNC_PORT PORTB
   #define VSYNC_PIN PB0
-  #define VSYNC_PIN_UP_MASK B00000001 // (1<<VSYNC_PIN)
-  #define VSYNC_PIN_DOWN_MASK B11111110 // ~VSYNC_PIN_UP_MASK
   #define VGA_PIXEL_CR DDRD
   #define VGA_PIXEL_PORT PORTD
   #define VGA_PIXEL_PIN PD1
@@ -76,8 +74,6 @@
   #define SOUNDPORT PORTD
   #define SOUNDPORTCR DDRD
   #define SOUNDPIN PD5
-  #define soundoff() SOUNDPORT &= ~(1<<SOUNDPIN) //check if is calculated at compile time
-  #define soundon() SOUNDPORT |= (1<<SOUNDPIN)
   //#define horizontalChars 17
   //#define verticalChars 11
 
@@ -97,12 +93,31 @@
 //#define STD_HT 63 // Using a 16bit timer maybe the limits can be pushed more
 #define MAX_HT (((F_CPU/8)/27027)-1) /*experimental minimum synchronizable F_HORIZONTAL timing for LG W2261 using 8bit counter (i2c hack?)*/
 #define STD_HT (((F_CPU/8)/31469)-1) /*F_HORIZONTAL industry standard*/ /*std_HT 63*/
-#define HT 65
+#define HT STD_HT
 //#define HT STD_HT
 //#define HT 73 //(70 max with schneider TV)
 #define F_HORIZONTAL ((F_CPU/8)/(HT+1)) // 8 is the TIMER2 prescale
 #define _720 0
 #define _640 1
+
+#ifndef MODE_720
+  #ifndef MODE_640
+    //#define MODE_720
+    #define MODE_640
+  #endif
+#else
+  #undef MODE_640
+#endif
+
+
+#ifndef EFFECT_SCANLINE
+  #ifndef NO_EFFECT_SCANLINE
+    #define EFFECT_SCANLINE
+    //#define NO_EFFECT_SCANLINE
+  #endif
+#else
+  #undef NO_EFFECT_SCANLINE
+#endif
 
 #define Black 0
 #define Blue 1
@@ -134,7 +149,6 @@
 #define brightPaper B01000000
 #define noBright B00000000
 
-
 #define MAX_ULONG 4294967295
 
 #define horizontalPixels (ardvga::horizontalChars * 8)
@@ -147,6 +161,14 @@
 #define nop() __asm__("nop\n\t")
 #define waitsendbyte() nop();nop();nop();nop();nop()
 #define waitfrontporch() nop();nop();nop()
+
+//#define VSYNC_PIN_UP_MASK (1 << VSYNC_PIN) 
+//#define VSYNC_PIN_DOWN_MASK ( ~ (1 << VSYNC_PIN))
+#define vsyncon() V_SYNC_PORT |= (1 << VSYNC_PIN)
+#define vsyncoff() V_SYNC_PORT &= ~(1 << VSYNC_PIN)
+#define soundoff() SOUNDPORT &= ~(1<<SOUNDPIN)
+#define soundon() SOUNDPORT |= (1<<SOUNDPIN)
+  
 
 extern "C" void TIMER2_OVF_vect(void) __attribute__ ((signal));
 extern "C" void TIMER2_COMPB_vect(void) __attribute__ ((signal));
@@ -237,8 +259,7 @@ class ardvga{
     static uint8_t hT;
     static uint8_t xPos;
     static uint8_t yPos;
-    static void lineProc_noskipLine();
-    static void lineProc_skipLine();
+
 };
 
 #endif

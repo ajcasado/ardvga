@@ -1,0 +1,73 @@
+{
+    "configurations": [
+        {
+            "name": "!!! WARNING !!! AUTO-GENERATED FILE, PLEASE DO NOT MODIFY IT AND USE https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags"
+        },
+        {
+            "name": "Linux",
+            "includePath": [
+                "/home/antonio/github/ardvga/include",
+                "/home/antonio/github/ardvga/src",
+                "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/cores/MightyCore",
+                "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/variants/standard",
+                "/home/antonio/.platformio/lib/PID_v1",
+                "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/AVR_examples/src",
+                "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/EEPROM/src",
+                "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/Ethernet/src",
+                "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/Optiboot_flasher/src",
+                "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/SD/src",
+                "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/SPI/src",
+                "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/SPI1/src",
+                "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/Servo/src",
+                "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/SoftwareSerial/src",
+                "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/Timer/src",
+                "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/Wire/src",
+                "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/Wire1/src",
+                "/home/antonio/.platformio/packages/tool-unity",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "/home/antonio/github/ardvga/include",
+                    "/home/antonio/github/ardvga/src",
+                    "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/cores/MightyCore",
+                    "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/variants/standard",
+                    "/home/antonio/.platformio/lib/PID_v1",
+                    "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/AVR_examples/src",
+                    "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/EEPROM/src",
+                    "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/Ethernet/src",
+                    "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/Optiboot_flasher/src",
+                    "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/SD/src",
+                    "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/SPI/src",
+                    "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/SPI1/src",
+                    "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/Servo/src",
+                    "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/SoftwareSerial/src",
+                    "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/Timer/src",
+                    "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/Wire/src",
+                    "/home/antonio/.platformio/packages/framework-arduino-avr-mightycore/libraries/Wire1/src",
+                    "/home/antonio/.platformio/packages/tool-unity",
+                    ""
+                ]
+            },
+            "defines": [
+                "PLATFORMIO=50001",
+                "ARDUINO_AVR_ATmega1284",
+                "F_CPU=27000000L",
+                "ARDUINO_ARCH_AVR",
+                "ARDUINO=10808",
+                "__AVR_ATmega1284P__",
+                ""
+            ],
+            "intelliSenseMode": "clang-x64",
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "compilerPath": "/home/antonio/.platformio/packages/toolchain-atmelavr/bin/avr-gcc",
+            "compilerArgs": [
+                "-mmcu=atmega1284p",
+                ""
+            ]
+        }
+    ],
+    "version": 4
+}

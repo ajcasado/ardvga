@@ -87,11 +87,11 @@ void loop() {
   //mivga.setNoSkipLine();
   //mivga.delay(5000);
   //mivga.setSkipLine();
-  mivga.ink(Black); mivga.paper(White); mivga.bPaper(1);mivga.bInk(0);mivga.ssa();
+  mivga.ink(inkBlack); mivga.paper(paperWhite); mivga.bPaper(noBright);mivga.bInk(noBright);mivga.ssa();
   for (int x = 0; x < (mivga.getHPixels()) ; x++)
     for (int y = 0; y < (mivga.getVPixels()) ; y++) {
       mivga.plot(x, y);
-      mivga.setattr(y / 8, x / 8, 7, y / 30 , 0, x / 32 * 4);
+      mivga.setattr(y / 8, x / 8, paperWhite , x / 32 , noBright , (y / 12)<<6);
     }
   //mivga.setNoSkipLine();
   mivga.delay(5000);

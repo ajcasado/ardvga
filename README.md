@@ -43,3 +43,4 @@ There are tested schematics for uno and nano boards based on atmega328p in the s
  
  -Define EFFECT_SCANLINE or NO_EFFECT_SCANLINE to configure the scanline effect. With scanline activated runs faster.
  
+VIDEO: https://youtu.be/EQStUlc8NUM
